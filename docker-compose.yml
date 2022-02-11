@@ -1,0 +1,22 @@
+version: "3.9"
+   
+services:
+  postgres:
+    image: postgres
+    volumes:
+      - ~/Projects/postgres-data/:/var/lib/postgresql/data
+    container_name: benkon-dev-postgres
+    environment:
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=admin123
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "5432:5432"
+
+  dev-pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@domain.local
+      - PGADMIN_DEFAULT_PASSWORD=SuperSecret
+    ports:
+      - "80:80"
