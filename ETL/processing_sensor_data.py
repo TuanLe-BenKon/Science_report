@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 from scipy import stats
-from sqlalchemy.types import TypeEngine
 
 from base_processing_data import extract_sql_data
 
@@ -53,24 +52,3 @@ def sensor_extract_transform(conn_url: str, info: pd.Series) -> pd.DataFrame:
                                                 user_id=info["user_id"],
                                                 name=info["name"])
     return df_processed_sensor
-
-
-# if __name__=="__main__":
-#     conn_url = 'postgresql+psycopg2://postgres:admin123@localhost:5432/b002'
-#     des_url = 'postgresql+psycopg2://postgres:admin123@localhost:5432/benkon_transformed_data'
-#     conn_engine = create_engine(conn_url)
-#     des_engine = create_engine(des_url)
-
-#     ### Getting device_id to data frame
-#     sql = """
-#         SELECT  d.id as device_id, d.address, d.alias, user_id, u.name
-#         FROM  public.devices as d 
-#             JOIN public.users as u ON d.user_id = u.id"""
-#     df = load_sql_data(conn_engine, sql)
-#     df_result = pd.DataFrame()
-#     for index, row in df.iterrows():
-#         ## Process sensor data
-#         df_sensor = sensor_pipeline(conn_engine, des_engine, row)
-#         df_result = pd.concat([df_result, df_sensor], ignore_index=True)
-
-#     load_df_data(df_result, des_engine, "transformed_sensor")
