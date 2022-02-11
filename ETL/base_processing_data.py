@@ -1,8 +1,5 @@
-import numpy as np
 import pandas as pd
-from scipy import stats
 from sqlalchemy import create_engine
-from sqlalchemy.types import TypeEngine
 
 
 def extract_sql_data(conn_url: str, sql_statement: str) -> pd.DataFrame:
