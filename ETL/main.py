@@ -1,9 +1,12 @@
 import pandas as pd
+from dotenv import load_dotenv
 
 from base_processing_data import load_df_data, extract_sql_data
 from processing_energy_data import energy_extract_transform
 from processing_sensor_data import sensor_extract_transform
 from processing_activities import activities_extract_transform
+
+load_dotenv()
 
 
 if __name__=="__main__":
