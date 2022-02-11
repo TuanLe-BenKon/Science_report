@@ -5,11 +5,11 @@ from scipy import stats
 from base_processing_data import extract_sql_data
 
 
-def process_engery_data(df: pd.DataFrame) -> pd.DataFrame:
-    ## remove duplications
-    df_result = df.groupby("timestamp")["energy", "power"].mean().reset_index()
+# def process_engery_data(df: pd.DataFrame) -> pd.DataFrame:
+#     ## remove duplications
+#     df_result = df.groupby("timestamp")["energy", "power"].mean().reset_index()
 
-    return df_result
+#     return df_result
 
 
 def process_sensor_data(df: pd.DataFrame) -> pd.DataFrame:
