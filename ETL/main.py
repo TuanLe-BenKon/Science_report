@@ -15,7 +15,7 @@ if __name__=="__main__":
         SELECT  d.id as device_id, d.address, d.alias, user_id, u.name
         FROM  public.devices as d 
             JOIN public.users as u ON d.user_id = u.id"""
-    df_raw_data = extract_sql_data(conn_url, sql).head()
+    df_raw_data = extract_sql_data(conn_url, sql)
 
     df_energy_ret = pd.DataFrame()
     df_sensor_ret = pd.DataFrame()
