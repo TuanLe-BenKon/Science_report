@@ -1,19 +1,26 @@
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy.types import TypeEngine
 
 
-def extract_sql_data(conn_url: str, sql_statement: str) -> pd.DataFrame:
-    engine = create_engine(conn_url)
+def extract_sql_data(engine: TypeEngine, sql_statement: str) -> pd.DataFrame:
     df = pd.read_sql(sql_statement, con=engine)
 
     return df
 
 
-def load_df_data(df: pd.DataFrame, des_url: str, table: str) -> None:
-    des_engine = create_engine(des_url)
+def load_df_data(df: pd.DataFrame, des_engine: TypeEngine, table: str) -> None:
     df.to_sql(table, con=des_engine, if_exists="replace", index=False)
     
-    df_new = pd.read_sql("SELECT * FROM {}".format(table), con=des_engine).head()
-    print(df_new)
+    print(df.head())
 
 
+def get_last_row(table_name: str, engine: TypeEngine) -> pd.DataFrame:
+    sql_last_row = """
+        SELECT * FROM {} ORDER BY timestamp DESC LIMIT 1
+    """.format(table_name)
+    try:
+        df = pd.read_sql(sql_last_row, engine)
+    except:
+        df = pd.DataFrame()
+
+    return df

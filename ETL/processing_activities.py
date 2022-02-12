@@ -1,9 +1,9 @@
-import json
 from datetime import datetime
 
 import pandas as pd
+from sqlalchemy.types import TypeEngine
 
-from base_processing_data import extract_sql_data
+from base_processing_data import get_last_row, extract_sql_data, load_df_data
 
 
 OPS_MODES = {
@@ -13,6 +13,10 @@ OPS_MODES = {
     4: "Cool",
     7: "Auto"
 }
+
+SOURCE_TABLE = "device_activities"
+DEST_TABLE = "transformed_activites"
+
 
 
 def parse_payload_str(row):
@@ -35,30 +39,41 @@ def process_activites(df_activities: pd.DataFrame) -> pd.DataFrame:
     df_activities[["temperature", "fan_speed", "operation_mode"]] = df_activities.apply(parse_payload_str, axis=1)
     df_activities["date"] = df_activities.apply(parse_date, axis=1)
 
-    neccessary_columns = ["device_id", "event_type", "is_success", "timestamp", "date", "temperature", "fan_speed", "operation_mode"]
+    neccessary_columns = ["device_id", "event_type", "user_id", "address", "is_success", "timestamp", "date", "temperature", "fan_speed", "operation_mode"]
     return df_activities.loc[df_activities["is_success"] == True][neccessary_columns]
 
 
-def activities_extract_transform(conn_url: str, info: pd.Series) -> pd.DataFrame:
-    sql_get_activities = """
+def generate_sql_statement(df_last_row: pd.DataFrame) -> str:
+    sql_statement = """
         SELECT da.id, device_id, d.address, d.alias, user_id, u.name, da.timestamp, extra, event_type, payload, is_success 
-        FROM public.device_activities as da 
+        FROM public.{} as da 
             JOIN public.devices as d ON da.device_id = d.id
             JOIN public.users as u ON d.user_id = u.id
-        WHERE device_id = '{}'
         ORDER BY da.timestamp, device_id, address ASC;
-    """.format(info["device_id"])
+    """.format(SOURCE_TABLE)
+    if not df_last_row.empty:
+        sql_statement = """
+            SELECT da.id, device_id, d.address, d.alias, user_id, u.name, da.timestamp, extra, event_type, payload, is_success 
+            FROM public.{} as da 
+                JOIN public.devices as d ON da.device_id = d.id
+                JOIN public.users as u ON d.user_id = u.id
+            WHERE da.timestamp > '{}'
+            ORDER BY da.timestamp, device_id, address ASC;
+        """.format(SOURCE_TABLE, df_last_row["timestamp"][0])
 
-    df_activities_raw = extract_sql_data(conn_url, sql_get_activities) 
+    return sql_statement
+
+
+def activities_ETL(conn_engine: TypeEngine, des_engine: TypeEngine) -> bool:
+    last_row = get_last_row(DEST_TABLE, des_engine)
+    activities_sql = generate_sql_statement(last_row)
+
+    df_activities_raw = extract_sql_data(conn_engine, activities_sql) 
     if df_activities_raw.empty:
         print("DataFrame has no data value")
         return
 
     df_proccesed_activities = process_activites(df_activities_raw)
-    df_proccesed_activities = df_proccesed_activities.assign(device_id = info["device_id"],
-                                                mac_address=info["address"],
-                                                alias=info["alias"],
-                                                user_id=info["user_id"],
-                                                name=info["name"])
+    load_df_data(df_proccesed_activities, des_engine, DEST_TABLE)
 
-    return df_proccesed_activities 
+    return True
