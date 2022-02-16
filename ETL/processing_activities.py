@@ -18,7 +18,6 @@ SOURCE_TABLE = "device_activities"
 DEST_TABLE = "transformed_activites"
 
 
-
 def parse_payload_str(row):
     # payload = row["payload"].replace("=>", ": ")
     # payload_dict = json.loads(payload)
