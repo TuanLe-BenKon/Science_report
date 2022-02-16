@@ -1,7 +1,6 @@
 import pandas as pd
 from sqlalchemy.types import TypeEngine
 
-
 from base_processing_data import get_last_row, extract_sql_data, load_df_data
 
 SOURCE_TABLE = "energy_data"
@@ -13,7 +12,6 @@ def process_engery_data(df: pd.DataFrame) -> pd.DataFrame:
     df_result = df.groupby("timestamp")["energy", "power"].mean().reset_index()
 
     return df_result
-
 
 
 def generate_sql_statement(df_last_row: pd.DataFrame) -> str:
@@ -35,6 +33,7 @@ def generate_sql_statement(df_last_row: pd.DataFrame) -> str:
         """.format(SOURCE_TABLE, df_last_row["timestamp"][0])
 
     return sql_statement
+
 
 def energy_ETL(conn_engine: TypeEngine, des_engine: TypeEngine) -> bool:
     last_row = get_last_row(DEST_TABLE, des_engine)
