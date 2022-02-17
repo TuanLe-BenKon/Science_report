@@ -9,9 +9,11 @@ from processing_activities import activities_extract_transform
 load_dotenv()
 
 
-if __name__=="__main__":
-    conn_url = 'postgresql+psycopg2://postgres:admin123@localhost:5432/b002'
-    des_url = 'postgresql+psycopg2://postgres:admin123@localhost:5432/benkon_transformed_data'
+if __name__ == "__main__":
+    conn_url = "postgresql+psycopg2://postgres:admin123@localhost:5432/b002"
+    des_url = (
+        "postgresql+psycopg2://postgres:admin123@localhost:5432/benkon_transformed_data"
+    )
 
     ### Getting device_id to data frame
     sql = """
@@ -26,16 +28,22 @@ if __name__=="__main__":
     for index, row in df_raw_data.iterrows():
         ## Process enegery data
         df_processed_energy = energy_extract_transform(conn_url, row)
-        df_energy_ret = pd.concat([df_sensor_ret, df_processed_energy], ignore_index=True)
+        df_energy_ret = pd.concat(
+            [df_sensor_ret, df_processed_energy], ignore_index=True
+        )
 
         ## Process sensor data
         df_processed_sensor = sensor_extract_transform(conn_url, row)
-        df_sensor_ret = pd.concat([df_sensor_ret, df_processed_sensor], ignore_index=True)
+        df_sensor_ret = pd.concat(
+            [df_sensor_ret, df_processed_sensor], ignore_index=True
+        )
 
         ## Process activities data
         df_activities_sensor = activities_extract_transform(conn_url, row)
-        df_activities_ret = pd.concat([df_activites_ret, df_activities_sensor], ignore_index=True)
-    
+        df_activities_ret = pd.concat(
+            [df_activites_ret, df_activities_sensor], ignore_index=True
+        )
+
     print("Energy data info")
     print(df_energy_ret.info())
     print("Sensor data info")

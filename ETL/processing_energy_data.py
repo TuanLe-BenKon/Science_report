@@ -19,7 +19,9 @@ def energy_extract_transform(conn_url: str, info: pd.Series) -> pd.DataFrame:
             JOIN public.users as u ON d.user_id = u.id
         WHERE device_id='{}'
         ORDER BY e.timestamp, device_id, address ASC;
-        """.format(info["device_id"])
+        """.format(
+        info["device_id"]
+    )
 
     df_energy_raw = extract_sql_data(conn_url, sql_get_enegery)
     if df_energy_raw.empty:
@@ -27,10 +29,12 @@ def energy_extract_transform(conn_url: str, info: pd.Series) -> pd.DataFrame:
         return
 
     df_processed_energy = process_engery_data(df_energy_raw)
-    df_processed_energy = df_processed_energy.assign(device_id = info["device_id"],
-                                                mac_address=info["address"],
-                                                alias=info["alias"],
-                                                user_id=info["user_id"],
-                                                name=info["name"])
+    df_processed_energy = df_processed_energy.assign(
+        device_id=info["device_id"],
+        mac_address=info["address"],
+        alias=info["alias"],
+        user_id=info["user_id"],
+        name=info["name"],
+    )
 
     return df_processed_energy
