@@ -1,0 +1,2 @@
+docker build --tag python-django .
+docker run --publish 8001:8001 python-django

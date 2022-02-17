@@ -11,7 +11,7 @@ services:
       - POSTGRESQL_PASSWORD=admin123
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
-      - "5432:5432"
+      - "5431:5432"
 
   dev-pgadmin:
     image: dpage/pgadmin4
