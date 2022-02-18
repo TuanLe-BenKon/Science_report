@@ -132,4 +132,4 @@ dmypy.json
 .pyre/
 
 # Sample data
-*-data/
+*-data/.env
