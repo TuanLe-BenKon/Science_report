@@ -3,7 +3,7 @@ from werkzeug.exceptions import HTTPException
 from marshmallow import Schema, fields, ValidationError
 from flask import Flask, render_template, Response, jsonify
 
-from api.tasks import get_device_data
+from api.tasks import energy_alert
 
 app = Flask(__name__)
 load_dotenv(find_dotenv())
@@ -25,7 +25,8 @@ def health():
 )
 def alert(device_id, user_id, init_timestamp):
 
-    return get_device_data(device_id, user_id, init_timestamp)
+    resp = energy_alert(device_id, user_id, init_timestamp)
+    return jsonify(msg=resp), 200
 
 
 @app.errorhandler(Exception)
@@ -33,7 +34,7 @@ def handle_error(e):
     code = 500
     if isinstance(e, HTTPException):
         code = e.code
-    return jsonify(error=str(e)), code
+    return jsonify(error="Something went wrong"), code
 
 
 if __name__ == "__main__":
