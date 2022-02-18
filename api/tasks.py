@@ -30,10 +30,11 @@ def get_device_data(device_id: UUID, user_id: int, init_timestamp: int) -> Respo
 
 
 def exceed_threshold(
-    start_timestamp: int, current_timestamp: int, current_power: int
+    start_timestamp: int, last_timestamp: int, current_power: int
 ) -> bool:
-    if current_timestamp >= start_timestamp + 60 * 60 * 2:
+    if last_timestamp >= start_timestamp + 60 * 60 * 2:
         if current_power > THRESHOLD:
+            print(current_power)
             return True
 
     return False
@@ -43,10 +44,9 @@ def energy_alert(device_id: UUID, user_id: int, init_timestamp: int):
     df = get_device_data(device_id, user_id, init_timestamp)
 
     start_timestamp = df.iloc[0]["timestamp"]
-    current_timestamp = df.tail(1)["timestamp"].values[0]
+    last_timestamp = df.tail(1)["timestamp"].values[0]
     power = df.tail(1)["power"].values[0]
-    result = exceed_threshold(start_timestamp, current_timestamp, power)
-
+    result = exceed_threshold(start_timestamp, last_timestamp, power)
     if result:
         return "exceed power asumption"
 
