@@ -14,7 +14,7 @@ def hello():
     return render_template("home.html")
 
 
-@app.route("/health")
+@app.route("/health/")
 def health():
     return Response(response="success", status=200)
 
