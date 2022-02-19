@@ -35,7 +35,3 @@ def handle_error(e):
     if isinstance(e, HTTPException):
         code = e.code
     return jsonify(error="Something went wrong"), code
-
-
-if __name__ == "__main__":
-    app.run(debug=True, port=8000)

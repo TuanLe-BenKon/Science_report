@@ -1,2 +1,3 @@
 docker image build --tag benkon-flask .
 docker run -p 8001:80 benkon-flask
+http://localhost:8001/v1/energy-alert/34b1104a-60eb-40b7-8ebc-4bd108bd3a84/2294/1631356545/
