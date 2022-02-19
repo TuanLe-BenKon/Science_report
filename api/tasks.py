@@ -24,7 +24,10 @@ def get_device_data(device_id: UUID, user_id: int, init_timestamp: int) -> Respo
     """.format(
         device_id, user_id, init_timestamp
     )
-    df = pd.read_sql(sql_statement, con=engine)
+    try:
+        df = pd.read_sql(sql_statement, con=engine)
+    except:
+        df = pd.DataFrame()
 
     return df
 
@@ -42,7 +45,8 @@ def exceed_threshold(
 
 def energy_alert(device_id: UUID, user_id: int, init_timestamp: int):
     df = get_device_data(device_id, user_id, init_timestamp)
-
+    if df.empty:
+        return "No data value"
     start_timestamp = df.iloc[0]["timestamp"]
     last_timestamp = df.tail(1)["timestamp"].values[0]
     power = df.tail(1)["power"].values[0]
