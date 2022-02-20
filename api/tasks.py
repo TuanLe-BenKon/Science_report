@@ -1,10 +1,13 @@
 import os
+from typing import Dict
 from uuid import UUID
 
 import pandas as pd
 from flask import Response
 
 from sqlalchemy import create_engine
+
+from api.errors import TaskCreatedError
 
 THRESHOLD = 1000
 URL = os.environ.get("SOURCE_DATABASE_URL")
@@ -43,7 +46,7 @@ def exceed_threshold(
     return False
 
 
-def energy_alert(device_id: UUID, user_id: int, init_timestamp: int):
+def energy_alert(device_id: UUID, user_id: int, init_timestamp: int) -> str:
     df = get_device_data(device_id, user_id, init_timestamp)
     if df.empty:
         return "No data value"
@@ -55,3 +58,8 @@ def energy_alert(device_id: UUID, user_id: int, init_timestamp: int):
         return "exceed power asumption"
 
     return "working normal"
+
+
+def register_energy_alert_task(data: Dict[str, str]) -> None:
+    print(data)
+    raise TaskCreatedError()
