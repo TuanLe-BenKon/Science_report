@@ -22,13 +22,18 @@ def health():
 
 
 @app.route(
-    "/v1/energy-alert-handler/<string:device_id>/<string:user_id>/<int:init_timestamp>/",
-    methods=["GET"],
+    "/v1/energy-alert-handler/",
+    methods=["POST"],
 )
-def alert(device_id, user_id, init_timestamp):
-
-    resp = energy_alert(device_id, user_id, init_timestamp)
-    return jsonify(msg=resp), 200
+def alert():
+    request_data = request.json
+    schema = EnergyAlertTaskSchema()
+    try:
+        valid_data = schema.load(request_data)
+        status_code = energy_alert(valid_data)
+        return message_resp("succeed", status_code)
+    except ValidationError as err:
+        return message_resp(err.messages, 400)
 
 
 @app.route("/v1/energy-alert-task/", methods=["POST"])

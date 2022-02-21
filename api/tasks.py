@@ -1,8 +1,10 @@
-import datetime
-import json
 import os
+import json
+import requests
+import datetime
 from uuid import UUID
 from typing import Dict
+from requests.structures import CaseInsensitiveDict
 
 import pandas as pd
 from flask import Response
@@ -48,18 +50,35 @@ def exceed_threshold(
     return False
 
 
-def energy_alert(device_id: UUID, user_id: int, init_timestamp: int) -> str:
+def energy_alert(data: Dict[str, str]) -> int:
+    user_id = data.get("user_id")
+    device_id = data.get("device_id")
+    init_timestamp = data.get("init_timestamp")
     df = get_device_data(device_id, user_id, init_timestamp)
     if df.empty:
-        return "No data value"
+        return 200
     start_timestamp = df.iloc[0]["timestamp"]
     last_timestamp = df.tail(1)["timestamp"].values[0]
     power = df.tail(1)["power"].values[0]
     result = exceed_threshold(start_timestamp, last_timestamp, power)
-    if result:
-        return "exceed power asumption"
 
-    return "working normal"
+    msg = "working normal"
+    if result:
+        msg = "exceed power asumption"
+
+    notify_data = {
+        "user_id": user_id,
+        "title": "Benkon Energy Alert",
+        "type": "energy_alert",
+        "body": msg,
+    }
+    headers = CaseInsensitiveDict()
+    headers["Content-Type"] = "application/json"
+    headers["Authorization"] = "Bearer " + os.environ.get("NOTIFICATION_TOKEN")
+    notify_url = os.environ.get("CREATE_ENERGY_ALERT_URL")
+    response = requests.post(notify_url, headers=headers, json=notify_data)
+
+    return response.status_code
 
 
 def register_energy_alert_task(data: Dict[str, str]) -> str:
