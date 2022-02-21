@@ -9,7 +9,6 @@ from api.validation_schema import EnergyAlertTaskSchema
 from api.utils import message_resp
 
 app = Flask(__name__)
-load_dotenv(find_dotenv())
 
 
 @app.route("/")
@@ -32,13 +31,12 @@ def alert(device_id, user_id, init_timestamp):
     return jsonify(msg=resp), 200
 
 
-@app.route("/v1/energy-alert-task", methods=["POST"])
+@app.route("/v1/energy-alert-task/", methods=["POST"])
 def energy_alert_task():
     request_data = request.json
     schema = EnergyAlertTaskSchema()
     try:
         valid_data = schema.load(request_data)
-        print(valid_data)
         tast_name = register_energy_alert_task(valid_data)
         return message_resp("Created task {}".format(tast_name), 201)
     except ValidationError as err:
@@ -51,3 +49,10 @@ def global_error_handler(e):
     if isinstance(e, HTTPException):
         code = e.code
     return jsonify(error="Something went wrong"), code
+
+
+if __name__ == "__main__":
+    load_dotenv(find_dotenv())
+
+    server_port = os.environ.get("PORT", "8080")
+    app.run(debug=False, port=server_port, host="0.0.0.0")

@@ -12,14 +12,10 @@ from google.protobuf import timestamp_pb2
 
 THRESHOLD = 1000
 IN_SECONDS = 7200  # 2 hours in seconds
-DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
-PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
-QUEUE_LOCATION = os.environ.get("CLOUD_TASK_LOCATION")
-QUEUE_ID = os.environ.get("CLOUD_TASK_NAME")
-CREATING_ALERT_URL = os.environ.get("CREATE_ENERGY_ALERT_URL")
 
 
 def get_device_data(device_id: UUID, user_id: int, init_timestamp: int) -> Response:
+    DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
     engine = create_engine(DATABASE_URL)
     sql_statement = """
         SELECT e.id, device_id, d.address, d.alias, user_id, u.name, power, energy, e.timestamp
@@ -68,6 +64,12 @@ def energy_alert(device_id: UUID, user_id: int, init_timestamp: int) -> str:
 
 def register_energy_alert_task(data: Dict[str, str]) -> str:
     client = tasks_v2.CloudTasksClient()
+
+    PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
+    QUEUE_LOCATION = os.environ.get("CLOUD_TASK_LOCATION")
+    QUEUE_ID = os.environ.get("CLOUD_TASK_NAME")
+    CREATING_ALERT_URL = os.environ.get("CREATE_ENERGY_ALERT_URL")
+
     # Time of 2 hours later by default
     in_seconds = data.get("in_seconds", IN_SECONDS)
     d = datetime.datetime.utcnow() + datetime.timedelta(seconds=in_seconds)
@@ -90,7 +92,6 @@ def register_energy_alert_task(data: Dict[str, str]) -> str:
     payload = json.dumps(data)
     converted_payload = payload.encode()
     task["http_request"]["body"] = converted_payload
-
     response = client.create_task(request={"parent": parent, "task": task})
 
     return response.name
