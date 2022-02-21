@@ -56,7 +56,7 @@ def energy_alert(data: Dict[str, str]) -> int:
     init_timestamp = data.get("init_timestamp")
     df = get_device_data(device_id, user_id, init_timestamp)
     if df.empty:
-        return 200
+        return 202
     start_timestamp = df.iloc[0]["timestamp"]
     last_timestamp = df.tail(1)["timestamp"].values[0]
     power = df.tail(1)["power"].values[0]
