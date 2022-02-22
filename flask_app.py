@@ -22,7 +22,7 @@ def health():
 
 
 @app.route(
-    "/v1/energy-alert-handler/",
+    "/v1/energy-alert-handler",
     methods=["POST"],
 )
 def alert():
@@ -36,7 +36,7 @@ def alert():
         return message_resp(err.messages, 400)
 
 
-@app.route("/v1/energy-alert-task/", methods=["POST"])
+@app.route("/v1/energy-alert-task", methods=["POST"])
 def energy_alert_task():
     request_data = request.json
     schema = EnergyAlertTaskSchema()

@@ -44,7 +44,6 @@ def exceed_threshold(
 ) -> bool:
     if last_timestamp >= start_timestamp + 60 * 60 * 2:
         if current_power > THRESHOLD:
-            print(current_power)
             return True
 
     return False
@@ -60,30 +59,31 @@ def energy_alert(data: Dict[str, str]) -> int:
     start_timestamp = df.iloc[0]["timestamp"]
     last_timestamp = df.tail(1)["timestamp"].values[0]
     power = df.tail(1)["power"].values[0]
-    result = exceed_threshold(start_timestamp, last_timestamp, power)
+    is_exceed = exceed_threshold(start_timestamp, last_timestamp, power)
 
-    msg = "working normal"
-    if result:
-        msg = "exceed power asumption"
+    if is_exceed:
+        # if the energy is higher than threshold send notification to customer
+        msg = "Your AC has been running at high power for 2 hours! Please check the setting or increase the temperature by 2 degrees."
 
-    notify_data = {
-        "user_id": user_id,
-        "title": "Benkon Energy Alert",
-        "type": "energy_alert",
-        "body": msg,
-    }
-    headers = CaseInsensitiveDict()
-    headers["Content-Type"] = "application/json"
-    headers["Authorization"] = "Bearer " + os.environ.get("NOTIFICATION_TOKEN")
-    notify_url = os.environ.get("CREATE_ENERGY_ALERT_URL")
-    response = requests.post(notify_url, headers=headers, json=notify_data)
+        notify_data = {
+            "user_id": user_id,
+            "title": "Benkon Energy Alert",
+            "type": "energy_alert",
+            "body": msg,
+        }
+        headers = CaseInsensitiveDict()
+        headers["Content-Type"] = "application/json"
+        headers["Authorization"] = "Bearer " + os.environ.get("NOTIFICATION_TOKEN")
+        notify_url = os.environ.get("NOTIFICATION_URL")
+        response = requests.post(notify_url, headers=headers, json=notify_data)
+        return response.status_code
 
-    return response.status_code
+    return 200
 
 
 def register_energy_alert_task(data: Dict[str, str]) -> str:
     client = tasks_v2.CloudTasksClient()
-
+    print("correct creds")
     PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
     QUEUE_LOCATION = os.environ.get("CLOUD_TASK_LOCATION")
     QUEUE_ID = os.environ.get("CLOUD_TASK_NAME")
