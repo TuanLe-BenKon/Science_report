@@ -12,24 +12,27 @@ from google.cloud import tasks_v2
 from sqlalchemy import create_engine
 from google.protobuf import timestamp_pb2
 
-THRESHOLD = 1000
+THRESHOLD_BY_POWER = {"1.0": 250, "1.4": 350, "2.0": 1000, "2.5": 2000}
 IN_SECONDS = 7200  # 2 hours in seconds
 
 
 def get_device_data(device_id: UUID, user_id: int, init_timestamp: int) -> Response:
     DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
     engine = create_engine(DATABASE_URL)
+
+    bounded_timestamp = init_timestamp + 60 * 60 * 2
     sql_statement = """
-        SELECT e.id, device_id, d.address, d.alias, user_id, u.name, power, energy, e.timestamp
+        SELECT e.id, device_id, d.address, btu, d.alias, user_id, u.name, power, energy, e.timestamp
         FROM public.energy_data as e 
             JOIN public.devices as d ON e.device_id = d.id 
             JOIN public.users as u ON d.user_id = u.id
         WHERE device_id='{}' 
             AND user_id='{}'
-            AND e.timestamp>={}
+            AND {} <= e.timestamp 
+            AND e.timestamp <= {}
         ORDER BY e.timestamp, device_id, address ASC;
     """.format(
-        device_id, user_id, init_timestamp
+        device_id, user_id, init_timestamp, bounded_timestamp
     )
     try:
         df = pd.read_sql(sql_statement, con=engine)
@@ -39,11 +42,24 @@ def get_device_data(device_id: UUID, user_id: int, init_timestamp: int) -> Respo
     return df
 
 
+def horse_power_group(btu: int) -> str:
+    if 8500 <= btu and btu <= 9500:
+        return "1.0"
+    elif 11500 <= btu and btu <= 12500:
+        return "1.5"
+    elif 17500 <= btu and btu <= 18500:
+        return "2.0"
+    elif 20500 <= btu and btu <= 22500:
+        return "2.5"
+
+
 def exceed_threshold(
-    start_timestamp: int, last_timestamp: int, current_power: int
+    start_timestamp: int, last_timestamp: int, current_power: int, btu: int
 ) -> bool:
-    if last_timestamp >= start_timestamp + 60 * 60 * 2:
-        if current_power > THRESHOLD:
+    horse_power = horse_power_group(btu)
+
+    if last_timestamp >= start_timestamp + 60 * 60 * 1.5:
+        if current_power > THRESHOLD_BY_POWER.get(horse_power, 1000):
             return True
 
     return False
@@ -58,8 +74,9 @@ def energy_alert(data: Dict[str, str]) -> int:
         return 202
     start_timestamp = df.iloc[0]["timestamp"]
     last_timestamp = df.tail(1)["timestamp"].values[0]
-    power = df.tail(1)["power"].values[0]
-    is_exceed = exceed_threshold(start_timestamp, last_timestamp, power)
+    power = df["power"].mean()
+    btu = df.tail(1)["btu"].values[0]
+    is_exceed = exceed_threshold(start_timestamp, last_timestamp, power, btu)
 
     if is_exceed:
         # if the energy is higher than threshold send notification to customer
@@ -83,7 +100,7 @@ def energy_alert(data: Dict[str, str]) -> int:
 
 def register_energy_alert_task(data: Dict[str, str]) -> str:
     client = tasks_v2.CloudTasksClient()
-    print("correct creds")
+
     PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
     QUEUE_LOCATION = os.environ.get("CLOUD_TASK_LOCATION")
     QUEUE_ID = os.environ.get("CLOUD_TASK_NAME")
