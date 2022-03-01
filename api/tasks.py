@@ -12,7 +12,7 @@ from google.cloud import tasks_v2
 from sqlalchemy import create_engine
 from google.protobuf import timestamp_pb2
 
-THRESHOLD_BY_POWER = {"1.0": 250, "1.4": 350, "2.0": 1000, "2.5": 2000}
+THRESHOLD_BY_POWER = {"1.0": 200, "1.4": 350, "2.0": 1000, "2.5": 2000}
 IN_SECONDS = 7200  # 2 hours in seconds
 
 
@@ -58,7 +58,7 @@ def exceed_threshold(
 ) -> bool:
     horse_power = horse_power_group(btu)
 
-    if last_timestamp >= start_timestamp + 60 * 60 * 1.5:
+    if last_timestamp >= start_timestamp + 60 * 60 * 1.8:
         if current_power > THRESHOLD_BY_POWER.get(horse_power, 1000):
             return True
 
@@ -76,11 +76,18 @@ def energy_alert(data: Dict[str, str]) -> int:
     last_timestamp = df.tail(1)["timestamp"].values[0]
     power = df["power"].mean()
     btu = df.tail(1)["btu"].values[0]
+    alias = df.tail(1)["alias"].values[0]
     is_exceed = exceed_threshold(start_timestamp, last_timestamp, power, btu)
 
     if is_exceed:
         # if the energy is higher than threshold send notification to customer
-        msg = "Your AC has been running at high power for 2 hours! Please check the setting or increase the temperature by 2 degrees."
+        msg = """
+            [ENERGY NOTIFICATION] Your {} has been running at high power ({} Watt) for 2 hours.
+
+            You can increase the temperature by 2 degrees to save energy.
+        """.format(
+            alias, power
+        )
 
         notify_data = {
             "user_id": user_id,
