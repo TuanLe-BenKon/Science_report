@@ -1,0 +1,6 @@
+docker image build --tag benkon-flask .
+docker run -p 8080:8080 benkon-flask
+http://localhost:8001/v1/energy-alert/34b1104a-60eb-40b7-8ebc-4bd108bd3a84/2294/1631356545/
+https://06625019-2c46-4f9b-9a5a-80e783fa1409.mock.pstmn.io
+
+FLASK_ENV=development
