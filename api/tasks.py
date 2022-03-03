@@ -82,9 +82,9 @@ def energy_alert(data: Dict[str, str]) -> int:
     if is_exceed:
         # if the energy is higher than threshold send notification to customer
         msg = """
-            [ENERGY NOTIFICATION] Your {} has been running at high power ({} Watt) for 2 hours.
+        [ENERGY NOTIFICATION] Your {} has been running at high power ({} Watt) for 2 hours.
 
-            You can increase the temperature by 2 degrees to save energy.
+        You can increase the temperature by 2 degrees to save energy.
         """.format(
             alias, power
         )
