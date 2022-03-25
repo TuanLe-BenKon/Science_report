@@ -11,19 +11,18 @@ from api.utils import message_resp
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.route("/science/")
 def hello():
     return render_template("home.html")
 
 
-@app.route("/health/")
+@app.route("/science/health/")
 def health():
     return message_resp()
 
 
 @app.route(
-    "/v1/energy-alert-handler",
-    methods=["POST"],
+    "/science/v1/energy-alert-handler", methods=["POST"],
 )
 def alert():
     request_data = request.json
@@ -36,7 +35,7 @@ def alert():
         return message_resp(err.messages, 400)
 
 
-@app.route("/v1/energy-alert-task", methods=["POST"])
+@app.route("/science/v1/energy-alert-task", methods=["POST"])
 def energy_alert_task():
     request_data = request.json
     schema = EnergyAlertTaskSchema()

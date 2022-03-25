@@ -12,7 +12,7 @@ from google.cloud import tasks_v2
 from sqlalchemy import create_engine
 from google.protobuf import timestamp_pb2
 
-THRESHOLD_BY_POWER = {"1.0": 200, "1.4": 350, "2.0": 1000, "2.5": 2000}
+THRESHOLD_BY_POWER = {"1.0": 300, "1.5": 500, "2.0": 2000, "2.5": 4000}
 IN_SECONDS = 7200  # 2 hours in seconds
 
 
@@ -81,12 +81,11 @@ def energy_alert(data: Dict[str, str]) -> int:
 
     if is_exceed:
         # if the energy is higher than threshold send notification to customer
-        msg = """
-            [ENERGY NOTIFICATION] Your {} has been running at high power ({} Watt) for 2 hours.
-
-            You can increase the temperature by 2 degrees to save energy.
-        """.format(
-            alias, power
+        msg = (
+            "[ENERGY NOTIFICATION] Your {} has been running at high power ({} Watt) for 2 hours. \n"
+            "You can increase the temperature by 2 degrees to save energy.".format(
+                alias, int(power)
+            )
         )
 
         notify_data = {
@@ -95,6 +94,7 @@ def energy_alert(data: Dict[str, str]) -> int:
             "type": "energy_alert",
             "body": msg,
         }
+
         headers = CaseInsensitiveDict()
         headers["Content-Type"] = "application/json"
         headers["Authorization"] = "Bearer " + os.environ.get("NOTIFICATION_TOKEN")
