@@ -1,0 +1,3 @@
+device_id,event_type,payload,is_success,extra,timestamp,created_at
+d5e2429d-94b8-4751-bd8f-e7110055cc76,scheduler_control,"{""power""=>false, ""swing""=>0, ""timer""=>{""power""=>false, ""enable""=>false, ""expire_timestamp""=>1648134001}, ""fan_speed""=>7, ""temperature""=>26.0, ""operation_mode""=>2}",true,{},1648134000,2022-03-24 16:22:04 UTC
+d5e2429d-94b8-4751-bd8f-e7110055cc76,scheduler_control,"{""power""=>true, ""swing""=>0, ""timer""=>{""power""=>false, ""enable""=>false, ""expire_timestamp""=>1648132202}, ""fan_speed""=>5, ""temperature""=>26.0, ""operation_mode""=>4}",true,{},1648132200,2022-03-24 16:22:04 UTC

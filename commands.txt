@@ -3,4 +3,5 @@ docker run -p 8080:8080 benkon-flask
 http://localhost:8001/v1/energy-alert/34b1104a-60eb-40b7-8ebc-4bd108bd3a84/2294/1631356545/
 https://06625019-2c46-4f9b-9a5a-80e783fa1409.mock.pstmn.io
 
+http://192.168.1.4:8080/science/dailyReport?user_id=11294&track_day=2022-03-24
 FLASK_ENV=development
