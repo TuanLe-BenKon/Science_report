@@ -95,12 +95,6 @@ def energy_alert(data: Dict[str, str]) -> int:
             "body": msg,
         }
 
-        notify_data = {
-            "user_id": user_id,
-            "title": "Benkon Energy Alert",
-            "type": "energy_alert",
-            "body": msg,
-        }
         headers = CaseInsensitiveDict()
         headers["Content-Type"] = "application/json"
         headers["Authorization"] = "Bearer " + os.environ.get("NOTIFICATION_TOKEN")
