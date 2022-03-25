@@ -81,13 +81,19 @@ def energy_alert(data: Dict[str, str]) -> int:
 
     if is_exceed:
         # if the energy is higher than threshold send notification to customer
-        msg = """
-        [ENERGY NOTIFICATION] Your {} has been running at high power ({} Watt) for 2 hours.
-
-        You can increase the temperature by 2 degrees to save energy.
-        """.format(
-            alias, power
+        msg = (
+            "[ENERGY NOTIFICATION] Your {} has been running at high power ({} Watt) for 2 hours. \n"
+            "You can increase the temperature by 2 degrees to save energy.".format(
+                alias, int(power)
+            )
         )
+
+        notify_data = {
+            "user_id": user_id,
+            "title": "Benkon Energy Alert",
+            "type": "energy_alert",
+            "body": msg,
+        }
 
         notify_data = {
             "user_id": user_id,
