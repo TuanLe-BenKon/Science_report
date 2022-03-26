@@ -35,14 +35,21 @@ def get_device_list(user_id):
 
 def send_mail(user_id, track_day):
     mail_content = '''
-        Báo cáo hoạt động của máy lạnh của khách hàng {}\n
-    '''.format(username[user_id])
+            Kính gửi quý khách hàng, \n
+            Đây là email tự động từ hệ thống BenKon AI Care, quý khách hàng vui lòng liên hệ nhân viên BenKon để được hỗ trợ tốt nhất. 
+            Các khái niệm được dùng trong report:
+            • Electricity Index (Wh): Chỉ số điện năng, tương tự như chỉ số điện của công tơ điện tử dùng để đo đếm điện năng tiêu thụ của máy điều hoà
+            • Power (W): Công suất tức thời, cho biết mức độ tiêu hao năng lượng của máy điều hoà 
+            • Temperature (°C): Nhiệt độ phòng tại vị trí gắn cảm biến (gần máy điều hoà)
+            • Humidity (%): Độ ẩm phòng tại vị trí gắn cảm biến (gần máy điều hoà) \n
+            Cám ơn quý khách hàng đã sử dụng dịch vụ Quản lý sử dụng điều hoà hiệu quả của BenKon.
+        '''
 
     # The mail addresses and password
     sender_address = 'benkon.cs@lab2lives.com'
     sender_pass = 'BenKonCS@123'
 
-    receiver_address = [
+    receiver_address = ['nhat.thai@lab2live.com'
                         # 'camp-testing-aaaaexabidfwdrbv3lndltt7q4@lab2lives.slack.com',
                         'minhdat.bk@gmail.com',
                         'tuan.le@lab2lives.com',
