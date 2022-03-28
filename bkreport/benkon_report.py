@@ -243,7 +243,7 @@ class BenKonReport:
         # page break
         self.elements.append(PageBreak())
 
-    def __getTableColumnWidth(self, percentageWidth: "list[float]") -> "list[float]":
+    def _getTableColumnWidth(self, percentageWidth: "list[float]") -> "list[float]":
         tableMaxWidth = self.conf.pageWidth - \
             self.conf.marginLeft - self.conf.marginRight
         totalWidth = 0
@@ -320,7 +320,7 @@ class BenKonReport:
             formattedLineData = []
 
         ''' Set table Columns width '''
-        table = Table(data, colWidths=self.__getTableColumnWidth(
+        table = Table(data, colWidths=self._getTableColumnWidth(
             [7, 15, 18, 15, 15, 16, 15]))
         tStyle = TableStyle([  # ('GRID',(0, 0), (-1, -1), 0.5, grey),
             ('ALIGN', (0, 0), (0, -1), 'CENTER'),

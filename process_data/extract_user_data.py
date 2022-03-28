@@ -1,13 +1,18 @@
 import os
+import time
 
 from process_data.utils import *
 from process_data.get_information import *
 from api.tasks import get_sensor_data, get_energy_data, get_activities_data
-from api.utils import convert_to_unix_timestamp
 
 bg_dir = os.getcwd() + '/images/chart/'
 MISSING_THRESHOLD = 11*60  # seconds
 ACTIVITIES_THRESHOLD = 5*60  # seconds
+
+
+def convert_to_unix_timestamp(_time: str) -> int:
+    __time = pd.to_datetime(_time)
+    return int(time.mktime(__time.timetuple()))
 
 
 def extract_user_data(user_id, device_id, track_day):
