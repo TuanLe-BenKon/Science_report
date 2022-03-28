@@ -1,6 +1,7 @@
 import pandas as pd
+import os
 
-df_info = pd.read_csv('C:\\Users\\Victus\\Documents\\BenKon\\data_report\\device_info.csv')
+df_info = pd.read_csv(os.getcwd() + '/device_info.csv')
 
 # Convert user_id and user_name to dict type
 df_username = df_info[['user_id', 'user_name']]

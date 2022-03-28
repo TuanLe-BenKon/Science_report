@@ -1,0 +1,117 @@
+user_id,user_name,device_id,device_name,status,outdoor_unit
+10019,The Coffee House Huỳnh Văn Bánh,e2454b1a-8b11-484f-8b0f-a156cd6df38e,Máy Aikibi lầu 2,,1
+10019,The Coffee House Huỳnh Văn Bánh,ab77127a-44c3-4566-ad27-2b88ab5705d1,Máy Aikibi trệt cửa ra vào,,1
+10019,The Coffee House Huỳnh Văn Bánh,25143e2a-d103-4dea-b1cd-8d3faba5b8db,Máy Aikibi trệt phải,,0
+10019,The Coffee House Huỳnh Văn Bánh,d3b1e261-87d5-4c86-984a-c01d7d3c8125,Máy Daikin âm trần,,0
+10019,The Coffee House Huỳnh Văn Bánh,7701be64-2d72-45f2-924d-c1cb40ebc3cb,Máy Aikibi tầng lửng,,1
+10019,The Coffee House Huỳnh Văn Bánh,bf77e103-4fa3-4284-9f32-1131bd82bc9f,Lầu 2 máy Daikin,,1
+10019,The Coffee House Huỳnh Văn Bánh,99e017fc-cfb1-44f2-861a-046744d6687b,Cục nóng máy trệt phải,,1
+10019,The Coffee House Huỳnh Văn Bánh,40c4be85-82d1-4dfc-b2f9-6f84cfa5985e,Cục nóng máy âm trần,,1
+7035,Say Say,9ee16bcb-fe06-49c7-b0a9-0e13f03bf745,Lầu 2 - phòng sau,,1
+7035,Say Say,90af809d-a04c-4936-84cb-b5f9af35aef6,Lầu 2 - mặt trước,,1
+7035,Say Say,b284ca36-9e29-47b0-b89f-1a8345ef4ec5,Phòng kho,,1
+7035,Say Say,01ed1587-ee00-498e-aaeb-acf871077a4c,Văn phòng,,1
+7035,Say Say,22b82303-4e61-4cb2-ac6b-dcd0579152b0,Khách 2,,1
+7035,Say Say,bb471f43-530f-4814-a304-b27e3bd55684,Khách 1,,1
+11291,APACHE FOOTWEAR,d7949b75-abe4-41a0-a1ea-c3327c0f680a,A320,,1
+11291,APACHE FOOTWEAR,b5bbe539-2cec-43e5-9d68-f26383458325,A309,,1
+11291,APACHE FOOTWEAR,82cbde62-2374-4969-a198-a2f157a0e33e,A318,,1
+11291,APACHE FOOTWEAR,a190d293-a8fd-4409-9288-2830e9d26e56,A311,,1
+11291,APACHE FOOTWEAR,951f99bf-1304-41ae-8258-2777669d85da,A316,,1
+11291,APACHE FOOTWEAR,f1c4bffa-edab-4348-9bbc-78bdba43e1b1,A312,,1
+11291,APACHE FOOTWEAR,bc0398d1-73b3-491b-b2d8-4ce977fa7eb7,A307,,1
+11291,APACHE FOOTWEAR,5900cd24-43ff-4754-8cba-ab45aaa01c49,A310,,1
+11291,APACHE FOOTWEAR,30b12bb1-d5fa-4f46-8a8e-116f5925fc9c,A305,,1
+11291,APACHE FOOTWEAR,e596f444-2086-43c0-b4a9-df7096c212dd,A308,,1
+11291,APACHE FOOTWEAR,c644891c-d84b-4ffb-be44-a195d171d58b,A303,,1
+11291,APACHE FOOTWEAR,0208a65a-0fb4-47e1-a2d7-711bdcaa47d7,A306,,1
+11291,APACHE FOOTWEAR,a2a90fc9-7331-4cea-8f1b-849cab5bf6b7,A301,,1
+11291,APACHE FOOTWEAR,9d9d3ac5-914d-4271-ba34-173f71835f86,A302,,1
+11292,APACHE 2,9100d979-e52e-4e64-814b-558575c8dcb4,A110,,1
+11292,APACHE 2,f56548cf-61ed-45cb-8328-bb3e26780c27,A106,,1
+11292,APACHE 2,5c405449-b3a5-44f9-a808-bb5ceee7305b,A203,,1
+11292,APACHE 2,87c63192-3cb1-4bd4-a895-7b29c1a2f1e9,Cầu thang 1,,1
+11292,APACHE 2,9e9bbe2b-1ee8-419d-a9aa-772e4c480d2f,A210,,1
+11292,APACHE 2,439a8fb8-ca68-4881-b228-4e55bc6c79d1,A201,,1
+11292,APACHE 2,1a8be075-1f70-43b7-8132-a6cca8b08af5,Cầu thang 2,,1
+11292,APACHE 2,b1c4262c-c42d-4608-8d48-0bde2e7945fe,A108,,1
+11294,The Coffee House Út Tịch,d6b5761d-3439-4d5f-9487-4dd9cb2f3706,DaiKin Trệt Thu Ngân,,1
+11294,The Coffee House Út Tịch,e7c51886-7070-4fda-a0d7-9753d1e9ceca,DaiKin Trệt Cầu Thang,,1
+11294,The Coffee House Út Tịch,46a5d141-9760-4ac1-934f-8fce43720b61,York I Lầu 1,,1
+11294,The Coffee House Út Tịch,a1ff4ca2-33ed-468e-a334-99b8a94a5f28,York II Lầu 1,,1
+11294,The Coffee House Út Tịch,d5e2429d-94b8-4751-bd8f-e7110055cc76,DaiKin Lầu 1,,1
+11296,The Coffee House Lê Văn Sỹ,6eeac56f-9441-4209-8709-930decc62f12,Daikin Tầng 1 Cầu Thang,,1
+11296,The Coffee House Lê Văn Sỹ,c8fb6bca-fcfb-4304-88be-aa5bd1702452,Daikin Tầng 1 Bên Ngoài,,1
+11296,The Coffee House Lê Văn Sỹ,adbf570e-5832-4281-87e2-1a526525a899,Daikin Trệt Cửa Ra Vào,,0
+11296,The Coffee House Lê Văn Sỹ,46867606-b1bc-4ada-806d-609cdd006138,Daikin Trệt Cầu Thang,,1
+11296,The Coffee House Lê Văn Sỹ,4a12ae2c-b10b-4a82-ab94-e65109b9a09c,York Tầng 2,,1
+11296,The Coffee House Lê Văn Sỹ,f719ae42-c2e1-47a1-88e3-0d7bdcec6107,DaiKin Tầng 2,,1
+11296,The Coffee House Lê Văn Sỹ,e556fcab-a296-41bc-89a8-47c09cc68fa5,Reetech Tầng 2,,1
+11296,The Coffee House Lê Văn Sỹ,44d163be-2b97-429e-b951-f4510571fba6,Cục nóng máy Daikin cửa ra vào,,1
+2294,BenKon,35ed54e1-aba5-44be-9a2b-04035c65d5a0,Dakin cuc nong,,1
+2294,BenKon,5ec35816-2da9-4760-a13f-d1e523b2723d,Office Casper,,1
+2294,BenKon,7d965423-9b23-41b3-8eb3-d46da7e90875,Office Sharp,,1
+2294,BenKon,2e7475a9-33a2-45a3-86f4-839245b60916,Office Daikin,,0
+10940,The Coffee Lab,a7ddd274-db25-4780-b605-2d535abfd096,May trung gian 2,,1
+10940,The Coffee Lab,1161a43a-7cdd-4a66-8370-c011050a503c,Cuc nong may am tran,,1
+10940,The Coffee Lab,cadff37c-22b4-4f56-8a6a-f1943525bdf9,May 1 Lau 2,,1
+10940,The Coffee Lab,311a5027-f5b2-45ae-8c18-46440e583225,May 4 Lau 2,,1
+10940,The Coffee Lab,7023a98d-8c96-4067-8d0f-56426098cf7d,May 2 Lau 2,,1
+10940,The Coffee Lab,b2cf2d22-c94e-4c64-95aa-5150c1401ee4,May 3 Lau 2,,1
+12,Taddy,6fbda9f0-7576-4d55-a4f6-ae06a65b3478,Bedroom,,1
+12,Taddy,c890f723-3cea-45f4-b35b-6825e000dd88,Khách Toshiba,,1
+12,Taddy,4eb939ac-61ce-4556-9c96-09167421362c,Ngủ 1.1,,1
+590,Tuân,8c7627d7-e314-4067-ad3f-28d1d0ff17c8,Lầu 1,,1
+590,Tuân,b387e837-d459-4d5d-b734-d01a28394c75,Lầu 4,,1
+590,Tuân,dd07bb40-ba9e-465c-93be-d67db204dce4,Lầu 2,,1
+6742,Trần Minh Nhật,2b6a8b12-97bc-454b-a82e-902c12479fb3,Nhật,,1
+4619,Kim Anh,531ea164-c251-4aa3-959e-97a313bf3163,Kim Anh-Phòng nhỏ,,1
+4619,Kim Anh,05f7dedc-a4cf-4149-bfe6-4e9244fb9a07,Kim Anh-Phòng lớn,,1
+5045,Tuấn Anh,3c856552-2e79-4eb0-b61e-e228d7bf1ab5,Mic,,1
+6078,Huy,d280c1a5-4853-4204-b04d-7ac1bf02bf2b,Huy,,1
+4179,Tam Nguyen,b86e1ab7-4d0e-4b26-af7a-59a280169f06,Phong Dau,,1
+4179,Tam Nguyen,7b44f80b-fbbd-463c-b907-79840ca6fb57,Phong Tam,,1
+11299,Lê Phương Thảo,590cd0f3-a705-4333-8b6a-34280848d12a,Máy 1,,1
+11299,Lê Phương Thảo,b7e9f353-e0db-494f-a7e8-fe56099fef2e,Máy 2,,1
+11299,Lê Phương Thảo,60e3e772-c356-436a-8265-9e11f8f8c0ef,Máy 3,,1
+22,Sơn,0b4aaf0e-1b71-487d-b172-39e9732fd7c9,Son bedroom,,1
+22,Sơn,c86f85d6-04ed-4198-bd77-0e703a778e41,Nhat bedroom,,1
+2238,Khanh Nguyen,1ad0da94-4604-4aed-8a4e-cfc1660bc98f,Khanh Room 1,,1
+176,Hiếu Pana,ba23d1d3-2605-4bf9-ab31-6afee2610ce3,Hieu-Pana 1.5-101-2E63,,1
+176,Hiếu Pana,8f890932-392a-439f-a95b-78418336dd52,Pana 1.0 61:33,,1
+11301,Duy Luân,b656b08e-d37f-4b95-8e03-f63b8981e5dd,Dàn nóng phòng làm việc,,1
+11301,Duy Luân,7e1543e6-18f7-4918-bfe0-d6592a6dae5a,Dàn nóng phòng ngủ,,1
+11301,Duy Luân,8f3751a1-f481-41c3-9eb8-6945b2932f1c,Dàn nóng phòng khách,,1
+11301,Duy Luân,33b7cdfb-90b8-4d75-904b-165521ca1504,Phòng khách,,0
+11301,Duy Luân,3bdaebe8-c076-4a1a-b13d-1107081469d6,Phòng ngủ,,0
+11301,Duy Luân,04fd809c-9589-4bbd-84fd-e9e01d823afa,Phòng làm việc,,0
+1856,Minh Hiếu,62e8f231-26f3-45f7-8138-116470ad5e20,Bed Room Energy,,1
+1856,Minh Hiếu,a2092388-2355-44f1-9d32-72926e70186d,Bed Room,,1
+1856,Minh Hiếu,51dbd50d-bdd4-4f06-8689-2c7eaff351ed,Vinick room,,1
+1856,Minh Hiếu,2b5db2f1-0568-43ee-bd79-f4c8306a4555,id_202,,1
+1856,Minh Hiếu,0a3b359b-d26b-4bf0-a741-2b866961d0ff,id_133,,1
+1856,Minh Hiếu,abf90bfb-2ab6-4502-bb14-2a737d252d33,id_131,,1
+1856,Minh Hiếu,6c1b6adf-1664-4062-9021-c3989f65a088,id_130,,1
+1856,Minh Hiếu,c8188e11-5a08-41d3-8426-c4c7cf0540ba,89 fw2.3.11.2,,1
+1856,Minh Hiếu,35c189e3-dc95-48bd-a7d7-4f4c11ebe78f,88 fw2.3.11.2,,1
+1856,Minh Hiếu,9924bd28-dead-4ca2-9bd6-6117223ddd78,86 fw2.3.11.2,,1
+1856,Minh Hiếu,5f4f5c88-aeb3-4d1f-aec3-5605b72223fb,34 fw2.3.11.2,,1
+4186,Lê Tiến,818b3fb4-f93f-47aa-8fae-97810dd51350,Tien,remove,1
+4186,Lê Tiến,f4dd4785-dd41-4be4-8e41-7028b6b3e0b7,Phong lau sau,remove,1
+11302,Carot Nguyễn,cd892bda-9679-4e08-b321-6b430f25841b,FTKB Daikin,,1
+5565,Quốc,6141e535-5cb6-42ae-bc1b-4064e0c7ed78,Quoc-Quoc,,1
+11307,Trinh Sun,35612c08-f059-43c2-afc0-a718bc845af5,Phong Trinh,remove,1
+11307,Trinh Sun,5a0f4c4b-0a27-4155-a170-410436dbc0dd,Phong Hanh,remove,1
+11315,Sun,11165acc-003a-4524-b376-1d29dfea86a6,Sun,,1
+11304,Nathan Nguyễn,8e7929e7-4cf4-4d4f-9edf-b3630841fc36,Nathan room,,1
+3064,Tú Đình Phan,307356e1-e496-4047-aeea-d4c2410a6657,id_26,,1
+3064,Tú Đình Phan,bcea6163-ea2f-4fa7-ad8a-c5de1f93a2f9,id_171,,1
+3064,Tú Đình Phan,eb0a400e-ba3f-441f-82c3-f263b20dfaa6,id_25,,1
+3064,Tú Đình Phan,65121032-79cf-4c9c-8ff3-8d1144cdda52,id_30,,1
+3064,Tú Đình Phan,3c955497-e959-4df8-9166-cd447c46d541,id_87,,1
+3064,Tú Đình Phan,f15db056-356b-4de5-a5e2-876d300cb9e2,id_124,,1
+3064,Tú Đình Phan,619815ac-032b-4587-89a8-bbdb56c77096,id_193,,1
+3064,Tú Đình Phan,4d483e46-17d1-4584-bb14-e973449c57e7,id_175,,1
+3064,Tú Đình Phan,8100fb8c-3fae-4120-b065-76dcce37a3a5,id_16,,1
+3064,Tú Đình Phan,349b7198-4497-47d5-bce8-25d6b599a633,id_139,,1
+26,Liam,4b44c830-470a-4b7f-8f27-50fcb4807190,Liams,,1

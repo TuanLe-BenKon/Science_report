@@ -321,7 +321,7 @@ class BenKonReport:
 
         ''' Set table Columns width '''
         table = Table(data, colWidths=self.__getTableColumnWidth(
-            [7, 15, 15, 15, 15, 18, 15]))
+            [7, 15, 18, 15, 15, 16, 15]))
         tStyle = TableStyle([  # ('GRID',(0, 0), (-1, -1), 0.5, grey),
             ('ALIGN', (0, 0), (0, -1), 'CENTER'),
             ('VALIGN', (0, 0), (-1, -1), 'CENTER'),
@@ -337,41 +337,3 @@ class BenKonReport:
 
         # page break
         self.elements.append(PageBreak())
-
-
-if __name__ == '__main__':
-    report = BenKonReport('./out/benkon_report.pdf', data=[
-        BenKonReportData(
-            user="The Coffee House Huỳnh Văn Bánh",
-            device="Máy Aikibi tầng lửng",
-            report_date=datetime.now(),
-            chart_url="images/reports_2022_02_25_10019_25143e2a-d103-4dea-b1cd-8d3faba5b8db_charts10019_25143e2a-d103-4dea-b1cd-8d3faba5b8db_2022-02-25.png",
-            energy_kwh=16.759,
-            activities=[
-                ACActivity(
-                    type="remote_control",
-                    power_status="OFF",
-                    op_mode="Cool",
-                    op_time="06:46",
-                    configured_temp=20.0,
-                    fan_speed=3,
-                ),
-                ACActivity(
-                    type="remote_control",
-                    power_status="OFF",
-                    op_mode="Cool",
-                    op_time="06:46",
-                    configured_temp=20.0,
-                    fan_speed=3,
-                ),
-                ACActivity(
-                    type="remote_control",
-                    power_status="OFF",
-                    op_mode="Cool",
-                    op_time="06:46",
-                    configured_temp=20.0,
-                    fan_speed=3,
-                ),
-            ],
-        ),
-    ])

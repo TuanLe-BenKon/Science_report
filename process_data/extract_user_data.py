@@ -2,8 +2,10 @@ import os
 
 from process_data.utils import *
 from process_data.get_information import *
+from api.tasks import get_sensor_data, get_energy_data, get_activities_data
+from api.utils import convert_to_unix_timestamp
 
-bg_dir = os.getcwd() + '/data/'
+bg_dir = os.getcwd() + '/images/chart/'
 MISSING_THRESHOLD = 11*60  # seconds
 ACTIVITIES_THRESHOLD = 5*60  # seconds
 
@@ -16,20 +18,7 @@ def extract_user_data(user_id, device_id, track_day):
     '''
         Process data frame sensor
     '''
-    report_dir = bg_dir + username[user_id] + '/' + device_name[device_id] + '/' + track_day + '/report/'
-    # print(report_dir)
-    os.makedirs(os.path.dirname(report_dir), exist_ok=True)
-
-    sensor_log = report_dir + 'Log_File_Sensor.txt'
-    f = open(sensor_log, 'w')
-
-    df_sensor = pd.read_csv('{}/{}/{}/{}/sensor_data-{}.csv'.format(
-        bg_dir,
-        username[user_id],
-        device_name[device_id],
-        track_day,
-        track_day
-    ))
+    df_sensor = get_sensor_data(device_id, user_id, convert_to_unix_timestamp(track_day), 24)
 
     ## Change UTC Time to Timestamp and Sort dataframe
     df_sensor = df_sensor[['timestamp', 'temperature', 'humidity']]
@@ -38,28 +27,19 @@ def extract_user_data(user_id, device_id, track_day):
     df_sensor.reset_index(drop=True, inplace=True)
 
     ## DROP DUPLICATED
-    df_sensor = drop_duplicated(df_sensor, f)
+    df_sensor = drop_duplicated(df_sensor)
 
     ## OUTLIERS
     df_sensor = process_outliers(df_sensor)
 
     ## MISSING DATA
-    df_sensor, df_sensor_missing = process_missing_data(df_sensor, user_id, device_id, date, 'sensor', f=f)
+    df_sensor, df_sensor_missing = process_missing_data(df_sensor, user_id, device_id, date, 'sensor')
 
     ###############################################################################################################
     '''
         Process data frame energy
     '''
-    energy_log = report_dir + 'Log_File_Energy.txt'
-    f = open(energy_log, 'w')
-
-    df_energy = pd.read_csv('{}/{}/{}/{}/energy_data-{}.csv'.format(
-        bg_dir,
-        username[user_id],
-        device_name[device_id],
-        track_day,
-        track_day
-    ))
+    df_energy = get_energy_data(device_id, user_id, convert_to_unix_timestamp(track_day), 24)
 
     ## Change UTC Time to Timestamp and Sort dataframe
     df_energy = df_energy[['timestamp', 'power', 'energy']]
@@ -68,13 +48,13 @@ def extract_user_data(user_id, device_id, track_day):
     df_energy.reset_index(drop=True, inplace=True)
 
     ## DROP DUPLICATED
-    df_energy = drop_duplicated(df_energy, f)
+    df_energy = drop_duplicated(df_energy)
 
     ## RESET ENERGY
     df_energy = process_reset(df_energy)
 
     ## MISSING DATA
-    df_energy, df_energy_missing = process_missing_data(df_energy, user_id, device_id, date, 'energy', f=f)
+    df_energy, df_energy_missing = process_missing_data(df_energy, user_id, device_id, date, 'energy')
 
     ###############################################################################################################
     '''
@@ -82,13 +62,7 @@ def extract_user_data(user_id, device_id, track_day):
     '''
     cols = ['event_type', 'timestamp', 'power', 'temperature', 'fan_speed', 'operation_mode']
 
-    df_activities = pd.read_csv('{}/{}/{}/{}/activities-{}.csv'.format(
-        bg_dir,
-        username[user_id],
-        device_name[device_id],
-        track_day,
-        track_day
-    ))
+    df_activities = get_activities_data(device_id, user_id, convert_to_unix_timestamp(track_day), 24)
 
     ## DROP DUPLICATED
     df_activities = drop_duplicated(df_activities)
@@ -119,7 +93,3 @@ def extract_user_data(user_id, device_id, track_day):
     df_missing = pd.concat([df_sensor_missing, df_energy_missing], ignore_index=True)
 
     return df_sensor, df_energy, df_activities, df_missing
-
-
-if __name__ == '__main__':
-    print(device_name)

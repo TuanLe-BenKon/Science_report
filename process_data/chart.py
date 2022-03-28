@@ -61,10 +61,6 @@ def export_chart(bg_dir, user_id, device_id, df_sensor, df_energy, df_activities
     axs[2].plot(df_sensor['timestamp'], df_sensor['humidity'], color='y', label='humidity')
     axs[2].set_ylabel('Humidity (%)', fontsize=14)
 
-    # axs[3].set_xlabel('Timestamp', fontsize=14)
-    # axs[3].set_ylabel('Activities', fontsize=14)
-    # axs[3].get_yaxis().set_ticks([])
-
     p = p1 + p2
     labs = [plot.get_label() for plot in p]
 
@@ -79,6 +75,9 @@ def export_chart(bg_dir, user_id, device_id, df_sensor, df_energy, df_activities
             flag_sch = True
         elif df_activities['event_type'].iloc[i] == 'add_scheduler':
             control = 'AddSch_' + str(i)
+            flag_sch = True
+        elif df_activities['event_type'].iloc[i] == 'delete_scheduler':
+            control = 'DelSch_' + str(i)
             flag_sch = True
         elif df_activities['event_type'].iloc[i] == 'remote_control':
             control = 'Remote_' + str(i)
@@ -118,14 +117,7 @@ def export_chart(bg_dir, user_id, device_id, df_sensor, df_energy, df_activities
 
     axs[0].legend(p1 + p2, labs, loc=0)
 
-    fig.savefig('{}/{}/{}/chart/{}_{}_{}_chart.png'.format(
-        bg_dir,
-        username[user_id],
-        device_name[device_id],
-        username[user_id],
-        device_name[device_id],
-        track_day
-    ))
+    fig.savefig(f'{bg_dir}/chart_{device_name[device_id]}.png')
     plt.close()
     # plt.show()
 

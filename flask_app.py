@@ -1,4 +1,9 @@
+import datetime
 import os
+import time
+
+import shutil
+import pandas as pd
 from dotenv import load_dotenv, find_dotenv
 from werkzeug.exceptions import HTTPException
 from marshmallow import Schema, fields, ValidationError
@@ -6,18 +11,12 @@ from flask import Flask, render_template, jsonify, request, Response
 
 from api.tasks import energy_alert, register_energy_alert_task
 from api.validation_schema import EnergyAlertTaskSchema
-from api.utils import message_resp
+from api.utils import message_resp, send_mail
 
 from bkreport import BenKonReport, BenKonReportData, ACActivity
-from process_data.download_data import *
 from process_data.extract_user_data import *
 from process_data.chart import *
 from process_data.get_information import *
-
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
-from email.mime.text import MIMEText
 
 app = Flask(__name__)
 
@@ -27,63 +26,18 @@ power = {
     None: 'Không có'
 }
 
+mail_list = [
+             # 'an.nguyen@seedcom.vn',
+             # 'luan.nguyen@seedcom.vn',
+             # 'thinh.huynhhuy@thecoffeehouse.vn',
+             # 'hai.hoang@thecoffeehouse.vn',
+             # 'phuong.huynhtuan@thecoffeehouse.vn'
+             ]
+
 
 def get_device_list(user_id):
     df_device_list = df_info[df_info['user_id'] == user_id]
     return df_device_list['device_id'].tolist()
-
-
-def send_mail(user_id, track_day):
-    mail_content = '''
-            Kính gửi quý khách hàng, \n
-            Đây là email tự động từ hệ thống BenKon AI Care, quý khách hàng vui lòng liên hệ nhân viên BenKon để được hỗ trợ tốt nhất. 
-            Các khái niệm được dùng trong report:
-            • Electricity Index (Wh): Chỉ số điện năng, tương tự như chỉ số điện của công tơ điện tử dùng để đo đếm điện năng tiêu thụ của máy điều hoà
-            • Power (W): Công suất tức thời, cho biết mức độ tiêu hao năng lượng của máy điều hoà 
-            • Temperature (°C): Nhiệt độ phòng tại vị trí gắn cảm biến (gần máy điều hoà)
-            • Humidity (%): Độ ẩm phòng tại vị trí gắn cảm biến (gần máy điều hoà) \n
-            Cám ơn quý khách hàng đã sử dụng dịch vụ Quản lý sử dụng điều hoà hiệu quả của BenKon.
-        '''
-
-    # The mail addresses and password
-    sender_address = 'benkon.cs@lab2lives.com'
-    sender_pass = 'BenKonCS@123'
-
-    receiver_address = ['nhat.thai@lab2live.com'
-                        # 'camp-testing-aaaaexabidfwdrbv3lndltt7q4@lab2lives.slack.com',
-                        'minhdat.bk@gmail.com',
-                        'tuan.le@lab2lives.com',
-                        ]
-
-    # Set up the MIME
-    message = MIMEMultipart()
-    message['From'] = sender_address
-    message['To'] = ", ".join(receiver_address)
-    message['Subject'] = f'BÁO CÁO TRẠNG THÁI HOẠT ĐỘNG CÁC MÁY LẠNH CỦA KHÁCH HÀNG {username[user_id]}'
-
-    # The body and the attachments for the mail
-    message.attach(MIMEText(mail_content, 'plain'))
-
-    file_name = 'benkon_report_{}_{}.pdf'.format(username[user_id], track_day)
-
-    with open('./data/{}/report/benkon_report_{}_{}.pdf'.format(username[user_id],
-                                                                username[user_id],
-                                                                track_day),
-              'rb') as f:
-        attach = MIMEApplication(f.read(), _subtype="pdf")
-    attach.add_header('Content-Disposition', 'attachment',
-                      filename=file_name)
-    message.attach(attach)
-
-    # Create SMTP session for sending the mail
-    session = smtplib.SMTP('smtp.gmail.com', 587)
-    session.starttls()
-    session.login(sender_address, sender_pass)
-    text = message.as_string()
-    session.sendmail(sender_address, receiver_address, text)
-    session.quit()
-
-    print('Mail Sent')
 
 
 @app.route("/science/dailyReport")
@@ -93,8 +47,6 @@ def dailyReport():
 
     device_id_list = get_device_list(user_id)
 
-    download_data(bg_dir, user_id, device_id_list, track_day, track_day)
-
     total_energy_consumption = 0
     filter_energy = 0
 
@@ -102,6 +54,10 @@ def dailyReport():
     label_list = []
     data = []
 
+    if os.path.exists('./images/chart/'):
+        shutil.rmtree('./images/chart/')
+
+    os.makedirs('./images/chart/', exist_ok=True)
     for device_id in device_id_list:
         print(device_name[device_id])
         date = pd.to_datetime(track_day)
@@ -136,14 +92,7 @@ def dailyReport():
             )
             activities.append(row_act)
 
-        chart_url = '{}/{}/{}/chart/{}_{}_{}_chart.png'.format(
-            bg_dir,
-            username[user_id],
-            device_name[device_id],
-            username[user_id],
-            device_name[device_id],
-            track_day
-        )
+        chart_url = f'{bg_dir}/chart_{device_name[device_id]}.png'
         if not os.path.exists(chart_url):
             chart_url = ''
 
@@ -165,16 +114,13 @@ def dailyReport():
         else:
             saving_percent = np.round(100 - (filter_energy * 100) / total_energy_consumption, 2)
 
-        export_pie_chart_energy_consumption(bg_dir, user_id, track_day, label_list, energy_list, saving_percent)
+        # export_pie_chart_energy_consumption(bg_dir, user_id, track_day, label_list, energy_list, saving_percent)
         # export_energy_consumption_and_working_time_chart(bg_dir, user_id, device_id_list, track_day)
 
-    os.makedirs('./data/{}/report'.format(username[user_id]), exist_ok=True)
-    report = BenKonReport('./data/{}/report/benkon_report_{}_{}.pdf'.format(username[user_id],
-                                                                            username[user_id],
-                                                                            track_day),
-                          data=data)
+    os.makedirs(f'./templates/report/', exist_ok=True)
+    report = BenKonReport('./templates/report/BenKon_Daily_Report.pdf', data=data)
 
-    send_mail(user_id, track_day)
+    send_mail(user_id, mail_list)
 
     return 'EMAIL HAS BEEN SENT'
 

@@ -16,11 +16,12 @@ THRESHOLD_BY_POWER = {"1.0": 300, "1.5": 500, "2.0": 2000, "2.5": 4000}
 IN_SECONDS = 7200  # 2 hours in seconds
 
 
-def get_device_data(device_id: UUID, user_id: int, init_timestamp: int) -> Response:
-    DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
+def get_energy_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> Response:
+    # DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
+    DATABASE_URL = 'postgresql://u1av3dn729ribb:p0985acde46eadca0fdf951d3a45a6aafeef12c3873e6e789dd22b64d7a5550e9@ec2-184-73-17-220.compute-1.amazonaws.com:5432/d2ev63ftiofi1u'
     engine = create_engine(DATABASE_URL)
 
-    bounded_timestamp = init_timestamp + 60 * 60 * 2
+    bounded_timestamp = init_timestamp + 60 * 60 * duration
     sql_statement = """
         SELECT e.id, device_id, d.address, btu, d.alias, user_id, u.name, power, energy, e.timestamp
         FROM public.energy_data as e 
@@ -33,6 +34,58 @@ def get_device_data(device_id: UUID, user_id: int, init_timestamp: int) -> Respo
         ORDER BY e.timestamp, device_id, address ASC;
     """.format(
         device_id, user_id, init_timestamp, bounded_timestamp
+    )
+    try:
+        df = pd.read_sql(sql_statement, con=engine)
+    except:
+        df = pd.DataFrame()
+
+    return df
+
+
+def get_sensor_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> Response:
+    # DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
+    DATABASE_URL = 'postgresql://u1av3dn729ribb:p0985acde46eadca0fdf951d3a45a6aafeef12c3873e6e789dd22b64d7a5550e9@ec2-184-73-17-220.compute-1.amazonaws.com:5432/d2ev63ftiofi1u'
+    engine = create_engine(DATABASE_URL)
+
+    bounded_timestamp = init_timestamp + 60 * 60 * duration
+    sql_statement = """
+        SELECT s.id, device_id, d.address, d.alias, user_id, u.name, temperature, humidity, s.timestamp
+        FROM public.sensor_data as s 
+            JOIN public.devices as d ON s.device_id = d.id 
+            JOIN public.users as u ON d.user_id = u.id
+        WHERE device_id='{}'
+            AND {} <= s.timestamp 
+            AND s.timestamp <= {}
+        ORDER BY s.timestamp, device_id, address ASC;
+        """.format(
+        device_id, init_timestamp, bounded_timestamp
+    )
+    try:
+        df = pd.read_sql(sql_statement, con=engine)
+    except:
+        df = pd.DataFrame()
+
+    return df
+
+
+def get_activities_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> Response:
+    # DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
+    DATABASE_URL = 'postgresql://u1av3dn729ribb:p0985acde46eadca0fdf951d3a45a6aafeef12c3873e6e789dd22b64d7a5550e9@ec2-184-73-17-220.compute-1.amazonaws.com:5432/d2ev63ftiofi1u'
+    engine = create_engine(DATABASE_URL)
+
+    bounded_timestamp = init_timestamp + 60 * 60 * duration
+    sql_statement = """
+        SELECT da.id, device_id, d.address, d.alias, user_id, u.name, da.timestamp, extra, event_type, payload, is_success 
+        FROM public.device_activities as da 
+            JOIN public.devices as d ON da.device_id = d.id
+            JOIN public.users as u ON d.user_id = u.id
+        WHERE device_id = '{}'
+            AND {} <= da.timestamp 
+            AND da.timestamp <= {}
+        ORDER BY da.timestamp, device_id, address ASC;
+        """.format(
+        device_id, init_timestamp, bounded_timestamp
     )
     try:
         df = pd.read_sql(sql_statement, con=engine)
@@ -69,7 +122,7 @@ def energy_alert(data: Dict[str, str]) -> int:
     user_id = data.get("user_id")
     device_id = data.get("device_id")
     init_timestamp = data.get("init_timestamp")
-    df = get_device_data(device_id, user_id, init_timestamp)
+    df = get_energy_data(device_id, user_id, init_timestamp)
     if df.empty:
         return 202
     start_timestamp = df.iloc[0]["timestamp"]

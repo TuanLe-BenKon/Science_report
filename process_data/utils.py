@@ -7,7 +7,7 @@ import json
 import numpy as np
 from process_data.get_information import *
 
-MISSING_THRESHOLD = 5*60 # seconds
+MISSING_THRESHOLD = 11*60 # seconds
 
 # Activities parser
 OPS_MODES = {
@@ -20,9 +20,9 @@ OPS_MODES = {
 
 
 def parse_payload_str(row):
-    payload = row["payload"].replace("=>", ": ")
-    payload_dict = json.loads(payload)
-    # payload_dict = row.get("payload", {})
+    # payload = row["payload"].replace("=>", ": ")
+    # payload_dict = json.loads(payload)
+    payload_dict = row.get("payload", {})
 
     power = payload_dict.get("power")
     temp = payload_dict.get("temperature")
