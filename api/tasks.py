@@ -17,8 +17,7 @@ IN_SECONDS = 7200  # 2 hours in seconds
 
 
 def get_energy_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> Response:
-    # DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
-    DATABASE_URL = 'postgresql://u1av3dn729ribb:p0985acde46eadca0fdf951d3a45a6aafeef12c3873e6e789dd22b64d7a5550e9@ec2-184-73-17-220.compute-1.amazonaws.com:5432/d2ev63ftiofi1u'
+    DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
     engine = create_engine(DATABASE_URL)
 
     bounded_timestamp = init_timestamp + 60 * 60 * duration
@@ -44,8 +43,7 @@ def get_energy_data(device_id: UUID, user_id: int, init_timestamp: int, duration
 
 
 def get_sensor_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> Response:
-    # DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
-    DATABASE_URL = 'postgresql://u1av3dn729ribb:p0985acde46eadca0fdf951d3a45a6aafeef12c3873e6e789dd22b64d7a5550e9@ec2-184-73-17-220.compute-1.amazonaws.com:5432/d2ev63ftiofi1u'
+    DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
     engine = create_engine(DATABASE_URL)
 
     bounded_timestamp = init_timestamp + 60 * 60 * duration
@@ -70,8 +68,7 @@ def get_sensor_data(device_id: UUID, user_id: int, init_timestamp: int, duration
 
 
 def get_activities_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> Response:
-    # DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
-    DATABASE_URL = 'postgresql://u1av3dn729ribb:p0985acde46eadca0fdf951d3a45a6aafeef12c3873e6e789dd22b64d7a5550e9@ec2-184-73-17-220.compute-1.amazonaws.com:5432/d2ev63ftiofi1u'
+    DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
     engine = create_engine(DATABASE_URL)
 
     bounded_timestamp = init_timestamp + 60 * 60 * duration
