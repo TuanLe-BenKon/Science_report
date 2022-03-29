@@ -1,7 +1,3 @@
-import datetime
-import os
-import time
-
 import pandas as pd
 from dotenv import load_dotenv, find_dotenv
 from werkzeug.exceptions import HTTPException
@@ -17,9 +13,7 @@ from process_data.get_information import *
 app = Flask(__name__)
 
 mail_list = [
-    "thomas.luu@lab2lives.com",
-    "nhat.thai@lab2lives.com",
-    "tuan.le@lab2lives.com",
+    "nhat.thai@lab2lives.com"
 ]
 
 
@@ -31,11 +25,14 @@ def hello():
 @app.route("/science/v1/daily-report", methods=["GET"])
 def dailyReport():
     data = request.args
-    user_id = int(data["user_id"])
-    track_day = data["track_day"]
 
-    direct = os.getcwd()
-    gen_report(direct, user_id, track_day)
+    try:
+        user_id = data["user_id"]
+        track_day = data["track_day"]
+    except ValidationError as err:
+        return message_resp(err.messages, 400)
+
+    gen_report(user_id, track_day)
     send_mail(user_id, mail_list)
 
     return message_resp()
@@ -84,3 +81,4 @@ if __name__ == "__main__":
     load_dotenv(find_dotenv())
     server_port = os.environ.get("PORT", "8080")
     app.run(debug=False, port=server_port, host="0.0.0.0")
+

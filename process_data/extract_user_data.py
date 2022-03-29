@@ -5,7 +5,6 @@ from process_data.utils import *
 from process_data.get_information import *
 from api.tasks import get_sensor_data, get_energy_data, get_activities_data
 
-bg_dir = os.getcwd() + '/images/chart/'
 MISSING_THRESHOLD = 11*60  # seconds
 ACTIVITIES_THRESHOLD = 5*60  # seconds
 

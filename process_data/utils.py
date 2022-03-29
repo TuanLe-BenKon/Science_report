@@ -3,7 +3,6 @@ import requests
 import datetime
 from datetime import datetime as dt
 import pandas as pd
-import json
 import numpy as np
 from process_data.get_information import *
 

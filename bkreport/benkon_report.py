@@ -70,7 +70,7 @@ class FooterCanvas(canvas.Canvas):
         self.saveState()
         self.setStrokeColorRGB(0, 0, 0)
         self.setLineWidth(1)
-        self.drawImage("images/logo.png", self.conf.marginLeft, self.conf.pageHeight - self.conf.marginBottom,
+        self.drawImage("icons/logo.png", self.conf.marginLeft, self.conf.pageHeight - self.conf.marginBottom,
                        width=150, height=50, preserveAspectRatio=True, mask='auto')
         self.line(self.conf.marginLeft, self.conf.pageHeight-self.conf.marginBottom,
                   self.conf.pageWidth - self.conf.marginRight, self.conf.pageHeight-self.conf.marginBottom)
@@ -97,7 +97,7 @@ class Energy(Flowable):
         self.canv.setLineWidth(2)
         self.canv.setStrokeColor(Color(50.0/255, 115.0/255, 50.0/255, 1))
         self.canv.roundRect(0, 0, self.width, self.height, self.width/6)
-        self.canv.drawImage("images/energy.png", 35, 60,
+        self.canv.drawImage("icons/energy.png", 35, 60,
                             width=30, height=30, preserveAspectRatio=True, mask='auto')
         self.canv.restoreState()
         self.canv.setFont('NotoSansB', 16)
@@ -185,12 +185,12 @@ class BenKonReport:
         spacer = Spacer(10, 0.5*cm)
         self.elements.append(spacer)
 
-        imgUser = Image('images/username.png')
+        imgUser = Image('icons/username.png')
         imgUser.drawHeight = iconSize
         imgUser.drawWidth = iconSize
         imgUser.hAlign = 'LEFT'
 
-        imgAC = Image('images/ac.png')
+        imgAC = Image('icons/ac.png')
         imgAC.drawHeight = iconSize
         imgAC.drawWidth = iconSize
         imgAC.hAlign = 'LEFT'

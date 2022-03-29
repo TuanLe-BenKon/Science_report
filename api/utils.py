@@ -1,3 +1,4 @@
+import os
 from typing import List
 from flask import Response, jsonify
 import io
@@ -16,18 +17,20 @@ from process_data.chart import *
 from process_data.get_information import *
 
 power = {True: "ON", False: "OFF", None: "Không có"}
+local_chart_dir = os.getcwd() + '\\tmp\\chart\\'
+local_report_dir = os.getcwd() + '\\tmp\\report\\'
 
 
 def message_resp(text: str = "succeeded", status_code: int = 200) -> Response:
     return jsonify(msg=text), status_code
 
 
-def get_device_list(user_id):
+def get_device_list(user_id: str) -> List[str]:
     df_device_list = df_info[df_info["user_id"] == user_id]
     return df_device_list["device_id"].tolist()
 
 
-def gen_report(direct: str, user_id: int, track_day: str) -> None:
+def gen_report(user_id: str, track_day: str) -> None:
     device_id_list = get_device_list(user_id)
 
     total_energy_consumption = 0
@@ -37,10 +40,10 @@ def gen_report(direct: str, user_id: int, track_day: str) -> None:
     label_list = []
     data = []
 
-    if os.path.exists(direct + "/images/chart/"):
-        shutil.rmtree(direct + "./images/chart/")
+    if os.path.exists(local_chart_dir):
+        shutil.rmtree(local_chart_dir)
 
-    os.makedirs(direct + "/images/chart/", exist_ok=True)
+    os.makedirs(local_chart_dir, exist_ok=True)
     for device_id in device_id_list:
         print(device_name[device_id])
         date = pd.to_datetime(track_day)
@@ -72,7 +75,7 @@ def gen_report(direct: str, user_id: int, track_day: str) -> None:
                 label_list.append(device_name[device_id])
 
             export_chart(
-                bg_dir, user_id, device_id, df_sensor, df_energy, df_activities, date
+                local_chart_dir, user_id, device_id, df_sensor, df_energy, df_activities, date
             )
 
         activities = []
@@ -91,7 +94,7 @@ def gen_report(direct: str, user_id: int, track_day: str) -> None:
             )
             activities.append(row_act)
 
-        chart_url = f"{bg_dir}/chart_{device_name[device_id]}.png"
+        chart_url = f"{local_chart_dir}/chart_{device_name[device_id]}.png"
         if not os.path.exists(chart_url):
             chart_url = ""
 
@@ -115,14 +118,11 @@ def gen_report(direct: str, user_id: int, track_day: str) -> None:
                 100 - (filter_energy * 100) / total_energy_consumption, 2
             )
 
-        # export_pie_chart_energy_consumption(bg_dir, user_id, track_day, label_list, energy_list, saving_percent)
-        # export_energy_consumption_and_working_time_chart(bg_dir, user_id, device_id_list, track_day)
-
-    os.makedirs(f"./templates/report/", exist_ok=True)
-    report = BenKonReport("./templates/report/BenKon_Daily_Report.pdf", data=data)
+    os.makedirs(f"{local_report_dir}", exist_ok=True)
+    report = BenKonReport(f"{local_report_dir}/BenKon_Daily_Report.pdf", data=data)
 
 
-def send_mail(user_id: int, list_mail: List[str]) -> None:
+def send_mail(user_id: str, list_mail: List[str]) -> None:
     mail_content = """
             Kính gửi quý khách hàng, \n
             Đây là email tự động từ hệ thống BenKon AI Care, quý khách hàng vui lòng liên hệ nhân viên BenKon để được hỗ trợ tốt nhất. 
@@ -139,7 +139,6 @@ def send_mail(user_id: int, list_mail: List[str]) -> None:
     sender_pass = "BenKonCS@123"
 
     receiver_address = list_mail
-    # receiver_address = list_mail
 
     # Set up the MIME
     message = MIMEMultipart()
