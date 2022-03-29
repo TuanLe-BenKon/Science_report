@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="452b2832-bed3-4359-8c6a-089f9b5c6b7f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/api/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bkreport/benkon_report.py" beforeDir="false" afterPath="$PROJECT_DIR$/bkreport/benkon_report.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/commands.txt" beforeDir="false" afterPath="$PROJECT_DIR$/commands.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flask_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/flask_app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/process_data/extract_user_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/process_data/extract_user_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/process_data/get_information.py" beforeDir="false" afterPath="$PROJECT_DIR$/process_data/get_information.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/process_data/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/process_data/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/device_info.csv" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
