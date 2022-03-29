@@ -17,33 +17,28 @@ from process_data.get_information import *
 app = Flask(__name__)
 
 mail_list = [
-             'an.nguyen@seedcom.vn',
-             'luan.nguyen@seedcom.vn',
-             'thinh.huynhhuy@thecoffeehouse.vn',
-             'hai.hoang@thecoffeehouse.vn',
-             'phuong.huynhtuan@thecoffeehouse.vn'
-             ]
-
-
-@app.route("/science/dailyReport")
-def dailyReport():
-
-    data = request.args
-
-    user_id = int(data['user_id'])
-    track_day = data['track_day']
-
-    direct = os.getcwd()
-    gen_report(direct, user_id, track_day)
-
-    send_mail(user_id, mail_list)
-
-    return message_resp()
+    "thomas.luu@lab2lives.com",
+    "nhat.thai@lab2lives.com",
+    "tuan.le@lab2lives.com",
+]
 
 
 @app.route("/science/")
 def hello():
     return render_template("home.html")
+
+
+@app.route("/science/v1/daily-report", methods=["GET"])
+def dailyReport():
+    data = request.args
+    user_id = int(data["user_id"])
+    track_day = data["track_day"]
+
+    direct = os.getcwd()
+    gen_report(direct, user_id, track_day)
+    send_mail(user_id, mail_list)
+
+    return message_resp()
 
 
 @app.route("/science/health/")

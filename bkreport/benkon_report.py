@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import os
-from ctypes import alignment
 from datetime import datetime
-from glob import escape
-from tkinter import RIGHT
-from turtle import fillcolor
 from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4, A3,inch
+from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.colors import Color
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, PageBreak, Image, Spacer, Table, TableStyle, Flowable)
-from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER, TA_JUSTIFY
-from reportlab.graphics.shapes import Line, LineShape, Drawing, Rect, Image as sImage
+from reportlab.lib.enums import TA_CENTER
+from reportlab.graphics.shapes import  Image as sImage
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
