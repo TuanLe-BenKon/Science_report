@@ -137,7 +137,7 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
     report = BenKonReport(f"{local_report_dir}/BenKon_Daily_Report.pdf", data=data)
 
 
-def send_mail(df_info: pd.DataFrame, user_id: str, list_mail: List[str]) -> None:
+def send_mail(df_info: pd.DataFrame, user_id: str, track_day: str, list_mail: List[str]) -> None:
 
     username = get_username(df_info)
 
@@ -162,7 +162,7 @@ def send_mail(df_info: pd.DataFrame, user_id: str, list_mail: List[str]) -> None
     message = MIMEMultipart()
     message["From"] = sender_address
     message["To"] = ", ".join(receiver_address)
-    message["Subject"] = f"BenKon Daily Report - {username[user_id]}"
+    message["Subject"] = f"BenKon Daily Report - {username[user_id]} - {track_day}"
 
     # The body and the attachments for the mail
     message.attach(MIMEText(mail_content, "plain"))

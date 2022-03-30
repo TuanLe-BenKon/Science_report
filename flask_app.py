@@ -44,7 +44,7 @@ def dailyReport():
         return message_resp(err.messages, 400)
 
     gen_report(df_info, user_id, track_day)
-    send_mail(df_info, user_id, mail_list)
+    send_mail(df_info, user_id, track_day, mail_list)
 
     return message_resp()
 
@@ -91,20 +91,6 @@ def global_error_handler(e):
 if __name__ == "__main__":
     load_dotenv(find_dotenv())
     create_tables()
-
-    # records = get_device_info()
-    # df_info = pd.DataFrame(
-    #     records,
-    #     columns=['no', 'user_id', 'user_name', 'device_id', 'device_name', 'status', 'outdoor_unit']
-    # )
-    # df_info = df_info.drop(columns='no')
-    #
-    # user_id = '10019'
-    # track_day = '2022-03-29'
-    #
-    # gen_report(df_info, user_id, track_day)
-    # send_mail(df_info, user_id, mail_list)
-
     server_port = os.environ.get("PORT", "8080")
     app.run(debug=False, port=server_port, host="0.0.0.0")
 
