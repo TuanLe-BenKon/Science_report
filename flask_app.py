@@ -1,20 +1,20 @@
-import pandas as pd
 from dotenv import load_dotenv, find_dotenv
 from werkzeug.exceptions import HTTPException
-from marshmallow import Schema, fields, ValidationError
-from flask import Flask, render_template, jsonify, request, Response
+from marshmallow import ValidationError
+from flask import Flask, render_template, jsonify, request
+from api.device_info.db import create_tables
 
 from api.tasks import energy_alert, register_energy_alert_task
-from api.validation_schema import EnergyAlertTaskSchema
+from api.validation_schema import EnergyAlertTaskSchema, GenReportSchema
 from api.utils import message_resp, send_mail, gen_report
-
 from process_data.get_information import *
+from api.device_info.routes import device_bp
+
 
 app = Flask(__name__)
+app.register_blueprint(device_bp, url_prefix="/science/device")
 
-mail_list = [
-    "nhat.thai@lab2lives.com"
-]
+mail_list = ["nhat.thai@lab2lives.com"]
 
 
 @app.route("/science/")
@@ -24,9 +24,10 @@ def hello():
 
 @app.route("/science/v1/daily-report", methods=["GET"])
 def dailyReport():
-    data = request.args
-
+    request_data = request.args
+    schema = GenReportSchema()
     try:
+        data = schema.load(request_data)
         user_id = data["user_id"]
         track_day = data["track_day"]
     except ValidationError as err:
@@ -69,16 +70,18 @@ def energy_alert_task():
         return message_resp(err.messages, 400)
 
 
-@app.errorhandler(Exception)
-def global_error_handler(e):
-    code = 400
-    if isinstance(e, HTTPException):
-        code = e.code
-    return jsonify(error="Something went wrong"), code
+# @app.errorhandler(Exception)
+# def global_error_handler(e):
+#     code = 400
+#     if isinstance(e, HTTPException):
+#         code = e.code
+#     return jsonify(error="Something went wrong"), code
 
 
 if __name__ == "__main__":
     load_dotenv(find_dotenv())
+    create_tables()
+
     server_port = os.environ.get("PORT", "8080")
-    app.run(debug=False, port=server_port, host="0.0.0.0")
+    app.run(debug=True, port=server_port, host="0.0.0.0")
 
