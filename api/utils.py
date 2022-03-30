@@ -1,5 +1,7 @@
 import os
-from typing import List
+from typing import List, Dict, Any
+
+import pandas as pd
 from flask import Response, jsonify
 import io
 from matplotlib.figure import Figure
@@ -14,30 +16,43 @@ from email.mime.text import MIMEText
 from bkreport import BenKonReport, BenKonReportData, ACActivity
 from process_data.extract_user_data import *
 from process_data.chart import *
-from process_data.get_information import *
 
 power = {True: "ON", False: "OFF", None: "Không có"}
 local_chart_dir = os.getcwd() + '\\tmp\\chart\\'
 local_report_dir = os.getcwd() + '\\tmp\\report\\'
 
 
+def get_username(df_info: pd.DataFrame) -> dict[Any, Any]:
+    # Convert user_id and user_name to dict type
+    df_username = df_info[["user_id", "user_name"]]
+    df_username = df_username.drop_duplicates().reset_index(drop=True)
+    username = dict(zip(df_username["user_id"], df_username["user_name"]))
+    return username
+
+
+def get_device_name(df_info: pd.DataFrame) -> dict[Any, Any]:
+    # Convert device_id and device_name to dict type
+    df_device_name = df_info[df_info["status"] == 1]
+    df_device_name = df_device_name[["device_id", "device_name"]]
+    df_device_name = df_device_name.drop_duplicates().reset_index(drop=True)
+    device_name = dict(zip(df_device_name["device_id"], df_device_name["device_name"]))
+    return device_name
+
+
+def get_device_list(df_info: pd.DataFrame, user_id: str) -> List[str]:
+    df_device_list = df_info[(df_info["user_id"] == user_id) & df_info['status'] == 1]
+    return df_device_list["device_id"].tolist()
+
+
 def message_resp(text: str = "succeeded", status_code: int = 200) -> Response:
     return jsonify(msg=text), status_code
 
 
-def get_device_list(user_id: str) -> List[str]:
-    df_device_list = df_info[df_info["user_id"] == user_id]
-    return df_device_list["device_id"].tolist()
+def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
+    username = get_username(df_info)
+    device_name = get_device_name(df_info)
+    device_id_list = get_device_list(df_info, user_id)
 
-
-def gen_report(user_id: str, track_day: str) -> None:
-    device_id_list = get_device_list(user_id)
-
-    total_energy_consumption = 0
-    filter_energy = 0
-
-    energy_list = []
-    label_list = []
     data = []
 
     if os.path.exists(local_chart_dir):
@@ -46,9 +61,10 @@ def gen_report(user_id: str, track_day: str) -> None:
     os.makedirs(local_chart_dir, exist_ok=True)
     for device_id in device_id_list:
         print(device_name[device_id])
+
         date = pd.to_datetime(track_day)
 
-        df_sensor, df_energy, df_activities, df_missing = extract_user_data(
+        df_sensor, df_energy, df_activities = extract_user_data(
             user_id, device_id, track_day
         )
 
@@ -59,39 +75,48 @@ def gen_report(user_id: str, track_day: str) -> None:
         ):
             pass
         else:
-            energy_consumption = get_energy_consumption(df_energy) / 1000
-            if (
-                np.isnan(energy_consumption)
-                or int(
-                    df_info[df_info["device_id"] == device_id].iloc[0]["outdoor_unit"]
-                )
-                == 0
-            ):
-                pass
-            else:
-                total_energy_consumption += get_energy_consumption(df_energy)
-                filter_energy += calc_energy_saving(df_energy, track_day)
-                energy_list.append(get_energy_consumption(df_energy) / 1000)
-                label_list.append(device_name[device_id])
-
             export_chart(
-                local_chart_dir, user_id, device_id, df_sensor, df_energy, df_activities, date
+                local_chart_dir, device_name, device_id, df_sensor, df_energy, df_activities, date
             )
 
+        # Load AC's activities to list
         activities = []
         for i in range(len(df_activities)):
+
+            # Convert time
             _time = df_activities["timestamp"].iloc[i]
             act_time = "{:02d}:{:02d}:{:02d}".format(
                 _time.hour, _time.minute, _time.second
             )
-            row_act = ACActivity(
-                type=df_activities["event_type"].iloc[i],
-                power_status=power[df_activities["power"].iloc[i]],
-                op_mode=df_activities["operation_mode"].iloc[i],
-                op_time=act_time,
-                configured_temp=df_activities["temperature"].iloc[i],
-                fan_speed=df_activities["fan_speed"].iloc[i],
-            )
+
+            # If event_type relates to scheduler
+            if df_activities['event_type'].iloc[i] == 'set_scheduler' or \
+                    df_activities['event_type'].iloc[i] == 'update_scheduler' or \
+                    df_activities['event_type'].iloc[i] == 'delete_scheduler':
+                row_act = ACActivity(
+                    type=df_activities["event_type"].iloc[i],
+                    power_status=power[df_activities["power"].iloc[i]],
+                    op_mode='Không có',
+                    op_time=act_time,
+                    configured_temp='Không có',
+                    fan_speed='Không có',
+                )
+            else:
+
+                # Fan Speed
+                if df_activities['fan_speed'].iloc[i] == 7:
+                    fan_speed = 'Auto'
+                else:
+                    fan_speed = str(int(df_activities['fan_speed'].iloc[i]))
+
+                row_act = ACActivity(
+                    type=df_activities["event_type"].iloc[i],
+                    power_status=power[df_activities["power"].iloc[i]],
+                    op_mode=df_activities["operation_mode"].iloc[i],
+                    op_time=act_time,
+                    configured_temp=str(int(df_activities["temperature"].iloc[i])) + '°C',
+                    fan_speed=fan_speed,
+                )
             activities.append(row_act)
 
         chart_url = f"{local_chart_dir}/chart_{device_name[device_id]}.png"
@@ -108,21 +133,14 @@ def gen_report(user_id: str, track_day: str) -> None:
         )
         data.append(data_report)
 
-    if len(energy_list) == 0 or len(label_list) == 0:
-        pass
-    else:
-        if total_energy_consumption == 0:
-            saving_percent = 0
-        else:
-            saving_percent = np.round(
-                100 - (filter_energy * 100) / total_energy_consumption, 2
-            )
-
     os.makedirs(f"{local_report_dir}", exist_ok=True)
     report = BenKonReport(f"{local_report_dir}/BenKon_Daily_Report.pdf", data=data)
 
 
-def send_mail(user_id: str, list_mail: List[str]) -> None:
+def send_mail(df_info: pd.DataFrame, user_id: str, list_mail: List[str]) -> None:
+
+    username = get_username(df_info)
+
     mail_content = """
             Kính gửi quý khách hàng, \n
             Đây là email tự động từ hệ thống BenKon AI Care, quý khách hàng vui lòng liên hệ nhân viên BenKon để được hỗ trợ tốt nhất. 
@@ -149,7 +167,7 @@ def send_mail(user_id: str, list_mail: List[str]) -> None:
     # The body and the attachments for the mail
     message.attach(MIMEText(mail_content, "plain"))
 
-    with open(f"./templates/report/BenKon_Daily_Report.pdf", "rb") as f:
+    with open(f"./tmp/report/BenKon_Daily_Report.pdf", "rb") as f:
         attach = MIMEApplication(f.read(), _subtype="pdf")
     attach.add_header(
         "Content-Disposition",

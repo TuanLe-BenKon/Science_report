@@ -1,8 +1,8 @@
 import os
 import time
+import datetime
 
 from process_data.utils import *
-from process_data.get_information import *
 from api.tasks import get_sensor_data, get_energy_data, get_activities_data
 
 MISSING_THRESHOLD = 11*60  # seconds
@@ -14,7 +14,7 @@ def convert_to_unix_timestamp(_time: str) -> int:
     return int(time.mktime(__time.timetuple()))
 
 
-def extract_user_data(user_id, device_id, track_day):
+def extract_user_data(user_id, device_id: str, track_day: str):
 
     date = pd.to_datetime(track_day)
 
@@ -37,7 +37,7 @@ def extract_user_data(user_id, device_id, track_day):
     df_sensor = process_outliers(df_sensor)
 
     ## MISSING DATA
-    df_sensor, df_sensor_missing = process_missing_data(df_sensor, user_id, device_id, date, 'sensor')
+    df_sensor = process_missing_data(df_sensor, 'sensor')
 
     ###############################################################################################################
     '''
@@ -58,7 +58,7 @@ def extract_user_data(user_id, device_id, track_day):
     df_energy = process_reset(df_energy)
 
     ## MISSING DATA
-    df_energy, df_energy_missing = process_missing_data(df_energy, user_id, device_id, date, 'energy')
+    df_energy = process_missing_data(df_energy, 'energy')
 
     ###############################################################################################################
     '''
@@ -94,6 +94,4 @@ def extract_user_data(user_id, device_id, track_day):
 
     df_activities = df_act
 
-    df_missing = pd.concat([df_sensor_missing, df_energy_missing], ignore_index=True)
-
-    return df_sensor, df_energy, df_activities, df_missing
+    return df_sensor, df_energy, df_activities

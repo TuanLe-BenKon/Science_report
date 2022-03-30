@@ -30,3 +30,4 @@ sheet = sh.worksheet("email_list")
 rows = sheet.get_all_values()
 
 df_email = pd.DataFrame.from_records(rows[1:], columns=rows[0])
+

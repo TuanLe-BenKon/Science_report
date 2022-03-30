@@ -1,9 +1,6 @@
-import os
-import datetime
 from datetime import datetime as dt
 import pandas as pd
 import numpy as np
-from process_data.get_information import *
 
 MISSING_THRESHOLD = 11*60 # seconds
 
@@ -82,16 +79,6 @@ def process_outliers(df):
 ## Reset Energy
 def process_reset(df):
     if len(df) != 0:
-        # min_energy = df['energy'].min()
-        # max_energy = df['energy'].max()
-        # start_energy = df['energy'].iloc[0]
-
-        # reset = np.where((df['energy'] < min_energy) | (df['energy'] - min_energy > 100000))[0]
-
-        # for i in range(len(reset)):
-        #     df.at[reset[i], 'energy'] = df['energy'].iloc[reset[i] - 1] 
-        #     df.at[reset[i], 'power'] = df['power'].iloc[reset[i] - 1]
-
         Q1 = df['energy'].quantile(0.2)
         Q3 = df['energy'].quantile(0.8)
 
@@ -114,62 +101,19 @@ def process_reset(df):
 
 
 ## Missing data
-def process_missing_data(df, user_id, device_id, date, data_type, f='n'):
+def process_missing_data(df, data_type):
 
     missing_list = []
     missing_time = 0
-    cnt = 0
-    df_missing = pd.DataFrame()
-    cols = ['username', 'device_name', 'total missing time', 'type']
 
-    if len(df) == 0:
-        df_missing = pd.concat([df_missing,
-                                pd.DataFrame([[username[user_id], 
-                                            device_name[device_id], 
-                                            -1, 
-                                            data_type]], 
-                                            columns=cols)
-                                ], 
-                                ignore_index=True)
-    else:
-        first_range = pd.to_timedelta((df['timestamp'].iloc[0] - date).total_seconds(), 'S').total_seconds()
-        if first_range > MISSING_THRESHOLD:
-            cnt += 1
-            missing_time += first_range
-            if f != 'n':
-                f.write(str(date) + ' - ' + str(df['timestamp'].iloc[0]) + ' - Delta time: ' + str(first_range) + '\n')
+    for i in range(len(df) - 1):
+        curr_time = df['timestamp'].iloc[i]
+        next_time = df['timestamp'].iloc[i + 1]
+        delta_time = next_time - curr_time
 
-        for i in range(len(df) - 1):
-            curr_time = df['timestamp'].iloc[i]
-            next_time = df['timestamp'].iloc[i + 1]
-            delta_time = next_time - curr_time
-
-            if delta_time.total_seconds() > MISSING_THRESHOLD:
-                missing_list.append((i, i + 1, curr_time, next_time, delta_time))
-                missing_time += delta_time.total_seconds()
-
-        last_range = (date + datetime.timedelta(days=1) - df['timestamp'].iloc[-1]).total_seconds()
-        if last_range > MISSING_THRESHOLD:
-            cnt += 1
-            missing_time += last_range
-            if f != 'n':
-                f.write(str(date + datetime.timedelta(days=1)) + ' - ' + str(df['timestamp'].tail(1).iloc[0]) + ' - Delta time: ' + str(last_range) + '\n')
-
-        df_missing = pd.concat([df_missing,
-                                pd.DataFrame([[username[user_id], 
-                                            device_name[device_id], 
-                                            missing_time, 
-                                            data_type]], 
-                                            columns=cols)
-                                ], 
-                                ignore_index=True)
-
-    if f != 'n':    
-        f.write('\n')
-        f.write('Missing data list: {:d} ranges\n'.format(len(missing_list) + cnt))
-        for i in range(len(missing_list)):
-            f.write(str(missing_list[i][2]) + ' - ' + str(missing_list[i][3]) + ' - Delta time: ' + str(missing_list[i][4]) + '\n')
-
+        if delta_time.total_seconds() > MISSING_THRESHOLD:
+            missing_list.append((i, i + 1, curr_time, next_time, delta_time))
+            missing_time += delta_time.total_seconds()
 
     ## Resample missing data
     k = 0
@@ -183,7 +127,10 @@ def process_missing_data(df, user_id, device_id, date, data_type, f='n'):
         # Get time
         df1 = df[k:info[0]]
 
-        df_temp['timestamp'] = pd.date_range(start=info[2], end=info[3], freq='30S')
+        df_temp['timestamp'] = pd.date_range(start=info[2] + pd.to_timedelta(30, 'S'),
+                                             end=info[3] - pd.to_timedelta(30, 'S'),
+                                             freq='30S'
+                                             )
 
         if info[4].total_seconds() > MISSING_THRESHOLD:
             if data_type == 'sensor':
@@ -211,7 +158,7 @@ def process_missing_data(df, user_id, device_id, date, data_type, f='n'):
     new_df = pd.concat(new_list, ignore_index=True)
     new_df.drop_duplicates(inplace=True)
 
-    return new_df, df_missing
+    return new_df
 
 
 ## Get Energy Consumption
@@ -254,34 +201,3 @@ def calc_energy_saving(df, track_day, hour_start=8, hour_end=21):
         return 0
     else:
         return max_e - min_e
-
-def extract_energy_df(bg_dir, user_id, device_id, track_day):
-    '''
-        Process data frame energy
-    '''
-    date = pd.to_datetime(track_day)
-
-    df_energy = pd.read_csv('{}/{}/{}/{}/energy_data-{}.csv'.format(
-        bg_dir,
-        username[user_id],
-        device_name[device_id],
-        track_day,
-        track_day
-    ))
-
-    ## Change UTC Time to Timestamp and Sort dataframe
-    df_energy = df_energy[['timestamp', 'power', 'energy']]
-    df_energy['timestamp'] = pd.to_datetime(df_energy['timestamp'].apply(lambda x: dt.fromtimestamp(x) + datetime.timedelta(hours=7)))
-    df_energy.sort_values(by='timestamp', inplace=True)
-    df_energy.reset_index(drop=True, inplace=True)
-
-    ## DROP DUPLICATED
-    df_energy = drop_duplicated(df_energy)
-
-    ## RESET ENERGY
-    df_energy = process_reset(df_energy)
-
-    ## MISSING DATA
-    df_energy, df_energy_missing = process_missing_data(df_energy, user_id, device_id, date, 'energy')
-
-    return df_energy

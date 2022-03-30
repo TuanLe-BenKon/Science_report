@@ -106,7 +106,7 @@ class Energy(Flowable):
 
 
 class ACActivity:
-    def __init__(self, type: str, power_status: str, op_mode: str, op_time: str, configured_temp: float, fan_speed: float) -> None:
+    def __init__(self, type: str, power_status: str, op_mode: str, op_time: str, configured_temp: str, fan_speed: str) -> None:
         self.type = type
         self.power_status = power_status
         self.op_mode = op_mode
@@ -305,7 +305,7 @@ class BenKonReport:
 
         for id, activity in enumerate(self.data[dataIndex].activities):
             lineData = [str(id+1), activity.op_time, activity.type, activity.power_status,
-                        activity.op_mode, "%.1f°C" % activity.configured_temp, str(activity.fan_speed)]
+                        activity.op_mode, activity.configured_temp, activity.fan_speed]
             columnNumber = 0
             for item in lineData:
                 ptext = "<font size='%s'>%s</font>" % (fontSize-1, item)
