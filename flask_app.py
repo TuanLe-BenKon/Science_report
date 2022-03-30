@@ -1,3 +1,4 @@
+import os
 from dotenv import load_dotenv, find_dotenv
 from werkzeug.exceptions import HTTPException
 from marshmallow import ValidationError
@@ -7,8 +8,8 @@ from api.device_info.db import create_tables
 from api.tasks import energy_alert, register_energy_alert_task
 from api.validation_schema import EnergyAlertTaskSchema, GenReportSchema
 from api.utils import message_resp, send_mail, gen_report
-from process_data.get_information import *
 from api.device_info.routes import device_bp
+from api.device_info.controllers import *
 
 
 app = Flask(__name__)
@@ -81,7 +82,6 @@ def global_error_handler(e):
 if __name__ == "__main__":
     load_dotenv(find_dotenv())
     create_tables()
-
     server_port = os.environ.get("PORT", "8080")
     app.run(debug=False, port=server_port, host="0.0.0.0")
 
