@@ -133,3 +133,4 @@ dmypy.json
 
 # Sample data
 *-data/.env
+.idea
