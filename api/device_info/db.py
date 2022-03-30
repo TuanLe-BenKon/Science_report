@@ -12,7 +12,8 @@ def get_db() -> Connection:
 def create_tables() -> None:
     tables = [
         """CREATE TABLE IF NOT EXISTS device_info(
-                user_id INTEGER PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT NOT NULL,
                 user_name TEXT NOT NULL,
                 device_id TEXT NOT NULL,
                 device_name TEXT NOT NULL,

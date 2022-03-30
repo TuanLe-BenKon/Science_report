@@ -15,13 +15,14 @@ def insert_device_info(
 
 
 def update_device_info(
-    user_id, user_name, device_id, device_name, status, outdoor_unit
+    id, user_id, user_name, device_id, device_name, status, outdoor_unit
 ):
     db = get_db()
     cursor = db.cursor()
     statement = "UPDATE device_info SET user_id = ?, user_name = ?,	device_id = ?, device_name = ?,	status = ?,	outdoor_unit = ? WHERE id = ?"
     cursor.execute(
-        statement, [user_id, user_name, device_id, device_name, status, outdoor_unit]
+        statement,
+        [user_id, user_name, device_id, device_name, status, outdoor_unit, id],
     )
     db.commit()
     return True
@@ -47,6 +48,6 @@ def get_by_id(id):
 def get_device_info():
     db = get_db()
     cursor = db.cursor()
-    query = "SELECT user_id, user_name,	device_id, device_name,	status,	outdoor_unit FROM device_info;"
+    query = "SELECT id, user_id, user_name,	device_id, device_name,	status,	outdoor_unit FROM device_info;"
     cursor.execute(query)
     return cursor.fetchall()
