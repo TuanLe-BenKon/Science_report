@@ -17,7 +17,13 @@ from api.device_info.controllers import *
 app = Flask(__name__)
 app.register_blueprint(device_bp, url_prefix="/science/device")
 
-mail_list = ["nhat.thai@lab2lives.com"]
+mail_list = [
+    'phuong.huynhtuan@thecoffeehouse.vn',
+    'an.nguyen@seedcom.vn',
+    'thinh.huynhhuy@thecoffeehouse.vn',
+    'hai.hoang@thecoffeehouse.vn',
+    'luan.nguyen@seedcom.vn'
+]
 
 
 @app.route("/science/")

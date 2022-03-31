@@ -16,7 +16,7 @@ THRESHOLD_BY_POWER = {"1.0": 300, "1.5": 500, "2.0": 2000, "2.5": 4000}
 IN_SECONDS = 7200  # 2 hours in seconds
 
 
-def get_energy_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> Response:
+def get_energy_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> pd.DataFrame:
     DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
     engine = create_engine(DATABASE_URL)
 
@@ -42,7 +42,7 @@ def get_energy_data(device_id: UUID, user_id: int, init_timestamp: int, duration
     return df
 
 
-def get_sensor_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> Response:
+def get_sensor_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> pd.DataFrame:
     DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
     engine = create_engine(DATABASE_URL)
 
@@ -67,7 +67,7 @@ def get_sensor_data(device_id: UUID, user_id: int, init_timestamp: int, duration
     return df
 
 
-def get_activities_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> Response:
+def get_activities_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> pd.DataFrame:
     DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
     engine = create_engine(DATABASE_URL)
 

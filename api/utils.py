@@ -157,6 +157,15 @@ def send_mail(df_info: pd.DataFrame, user_id: str, track_day: str, list_mail: Li
     sender_pass = "BenKonCS@123"
 
     receiver_address = list_mail
+    bcc = [
+        'tuan.le@lab2lives.com',
+        'hieu.tran@lab2lives.com',
+        'taddy@lab2lives.com',
+        'liam.thai@lab2lives.com',
+        'dung.bui@lab2lives.com',
+        'camp-testing-aaaaexabidfwdrbv3lndltt7q4@lab2lives.slack.com',
+        'ann.tran@lab2lives.com'
+    ]
 
     # Set up the MIME
     message = MIMEMultipart()
@@ -181,7 +190,7 @@ def send_mail(df_info: pd.DataFrame, user_id: str, track_day: str, list_mail: Li
     session.starttls()
     session.login(sender_address, sender_pass)
     text = message.as_string()
-    session.sendmail(sender_address, receiver_address, text)
+    session.sendmail(sender_address, receiver_address + bcc, text)
     session.quit()
 
     print("Mail Sent")

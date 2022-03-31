@@ -68,12 +68,13 @@ def extract_user_data(user_id, device_id: str, track_day: str):
 
     df_activities = get_activities_data(device_id, user_id, convert_to_unix_timestamp(track_day), 24)
 
-    ## DROP DUPLICATED
-    df_activities = drop_duplicated(df_activities)
-
     ## RESAMPLE
     if len(df_activities) > 0:
         df2 = process_activities(df_activities)
+
+        ## DROP DUPLICATED
+        df2 = drop_duplicated(df2)
+
         df2['timestamp'] = pd.to_datetime(df2['timestamp'].apply(lambda x: dt.fromtimestamp(x)))
         df2.sort_values(by='timestamp', inplace=True)
     else:
@@ -83,14 +84,18 @@ def extract_user_data(user_id, device_id: str, track_day: str):
 
     df_act = pd.DataFrame(columns=cols)
     for i in range(len(df2)):
-        curr_t = df2['timestamp'].iloc[i]
 
-        df_next = df2[(df2['timestamp'] > curr_t) & (df2['timestamp'] < curr_t + datetime.timedelta(seconds=ACTIVITIES_THRESHOLD))]
-
-        if len(df_next) != 0:
-            continue
-        else:
+        if 'scheduler' in df2['event_type'].iloc[i]:
             df_act = pd.concat([df_act, pd.DataFrame([df2.iloc[i]], columns=cols)], ignore_index=True)
+        else:
+            curr_t = df2['timestamp'].iloc[i]
+
+            df_next = df2[(df2['timestamp'] > curr_t) & (df2['timestamp'] < curr_t + datetime.timedelta(seconds=ACTIVITIES_THRESHOLD))]
+
+            if len(df_next) != 0:
+                continue
+            else:
+                df_act = pd.concat([df_act, pd.DataFrame([df2.iloc[i]], columns=cols)], ignore_index=True)
 
     df_activities = df_act
 

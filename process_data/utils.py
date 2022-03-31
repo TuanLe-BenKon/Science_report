@@ -42,17 +42,8 @@ def process_activities(df_activities: pd.DataFrame) -> pd.DataFrame:
 ## Drop duplicated data
 def drop_duplicated(df, f='n'):
 
-    if f != 'n':
-        sensor_data_duplicated = df.duplicated(subset='timestamp')
-        sensor_data_duplicated_list = np.where(sensor_data_duplicated == True)[0]
-
-        f.write('Duplicated list: {:d} elements\n'.format(len(sensor_data_duplicated_list)))
-        for i in range(len(sensor_data_duplicated_list)):
-            f.write(str(df['timestamp'].iloc[sensor_data_duplicated_list[i]]) + '\n')
-        f.write('------------------------------------------\n')
-
-        df.drop_duplicates(inplace=True)
-        df.reset_index(drop=True, inplace=True)
+    df.drop_duplicates(inplace=True)
+    df.reset_index(drop=True, inplace=True)
 
     return df
 
