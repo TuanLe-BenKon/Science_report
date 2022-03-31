@@ -18,11 +18,11 @@ from process_data.extract_user_data import *
 from process_data.chart import *
 
 power = {True: "ON", False: "OFF", None: "Không có"}
-local_chart_dir = os.getcwd() + '\\tmp\\chart\\'
-local_report_dir = os.getcwd() + '\\tmp\\report\\'
+local_chart_dir = os.getcwd() + "\\tmp\\chart\\"
+local_report_dir = os.getcwd() + "\\tmp\\report\\"
 
 
-def get_username(df_info: pd.DataFrame) -> dict[Any, Any]:
+def get_username(df_info: pd.DataFrame) -> Dict[Any, Any]:
     # Convert user_id and user_name to dict type
     df_username = df_info[["user_id", "user_name"]]
     df_username = df_username.drop_duplicates().reset_index(drop=True)
@@ -30,7 +30,7 @@ def get_username(df_info: pd.DataFrame) -> dict[Any, Any]:
     return username
 
 
-def get_device_name(df_info: pd.DataFrame) -> dict[Any, Any]:
+def get_device_name(df_info: pd.DataFrame) -> Dict[Any, Any]:
     # Convert device_id and device_name to dict type
     df_device_name = df_info[df_info["status"] == 1]
     df_device_name = df_device_name[["device_id", "device_name"]]
@@ -40,7 +40,7 @@ def get_device_name(df_info: pd.DataFrame) -> dict[Any, Any]:
 
 
 def get_device_list(df_info: pd.DataFrame, user_id: str) -> List[str]:
-    df_device_list = df_info[(df_info["user_id"] == user_id) & df_info['status'] == 1]
+    df_device_list = df_info[(df_info["user_id"] == user_id) & df_info["status"] == 1]
     return df_device_list["device_id"].tolist()
 
 
@@ -76,7 +76,13 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
             pass
         else:
             export_chart(
-                local_chart_dir, device_name, device_id, df_sensor, df_energy, df_activities, date
+                local_chart_dir,
+                device_name,
+                device_id,
+                df_sensor,
+                df_energy,
+                df_activities,
+                date,
             )
 
         # Load AC's activities to list
@@ -90,31 +96,34 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
             )
 
             # If event_type relates to scheduler
-            if df_activities['event_type'].iloc[i] == 'set_scheduler' or \
-                    df_activities['event_type'].iloc[i] == 'update_scheduler' or \
-                    df_activities['event_type'].iloc[i] == 'delete_scheduler':
+            if (
+                df_activities["event_type"].iloc[i] == "set_scheduler"
+                or df_activities["event_type"].iloc[i] == "update_scheduler"
+                or df_activities["event_type"].iloc[i] == "delete_scheduler"
+            ):
                 row_act = ACActivity(
                     type=df_activities["event_type"].iloc[i],
                     power_status=power[df_activities["power"].iloc[i]],
-                    op_mode='Không có',
+                    op_mode="Không có",
                     op_time=act_time,
-                    configured_temp='Không có',
-                    fan_speed='Không có',
+                    configured_temp="Không có",
+                    fan_speed="Không có",
                 )
             else:
 
                 # Fan Speed
-                if df_activities['fan_speed'].iloc[i] == 7:
-                    fan_speed = 'Auto'
+                if df_activities["fan_speed"].iloc[i] == 7:
+                    fan_speed = "Auto"
                 else:
-                    fan_speed = str(int(df_activities['fan_speed'].iloc[i]))
+                    fan_speed = str(int(df_activities["fan_speed"].iloc[i]))
 
                 row_act = ACActivity(
                     type=df_activities["event_type"].iloc[i],
                     power_status=power[df_activities["power"].iloc[i]],
                     op_mode=df_activities["operation_mode"].iloc[i],
                     op_time=act_time,
-                    configured_temp=str(int(df_activities["temperature"].iloc[i])) + '°C',
+                    configured_temp=str(int(df_activities["temperature"].iloc[i]))
+                    + "°C",
                     fan_speed=fan_speed,
                 )
             activities.append(row_act)
@@ -137,7 +146,9 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
     report = BenKonReport(f"{local_report_dir}/BenKon_Daily_Report.pdf", data=data)
 
 
-def send_mail(df_info: pd.DataFrame, user_id: str, track_day: str, list_mail: List[str]) -> None:
+def send_mail(
+    df_info: pd.DataFrame, user_id: str, track_day: str, list_mail: List[str]
+) -> None:
 
     username = get_username(df_info)
 
@@ -158,13 +169,13 @@ def send_mail(df_info: pd.DataFrame, user_id: str, track_day: str, list_mail: Li
 
     receiver_address = list_mail
     bcc = [
-        'tuan.le@lab2lives.com',
-        'hieu.tran@lab2lives.com',
-        'taddy@lab2lives.com',
-        'liam.thai@lab2lives.com',
-        'dung.bui@lab2lives.com',
-        'camp-testing-aaaaexabidfwdrbv3lndltt7q4@lab2lives.slack.com',
-        'ann.tran@lab2lives.com'
+        "tuan.le@lab2lives.com",
+        "hieu.tran@lab2lives.com",
+        "taddy@lab2lives.com",
+        "liam.thai@lab2lives.com",
+        "dung.bui@lab2lives.com",
+        "camp-testing-aaaaexabidfwdrbv3lndltt7q4@lab2lives.slack.com",
+        "ann.tran@lab2lives.com",
     ]
 
     # Set up the MIME
