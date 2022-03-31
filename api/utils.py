@@ -190,7 +190,7 @@ def send_mail(df_info: pd.DataFrame, user_id: str, track_day: str, list_mail: Li
     session.starttls()
     session.login(sender_address, sender_pass)
     text = message.as_string()
-    session.sendmail(sender_address, receiver_address + bcc, text)
+    session.sendmail(sender_address, receiver_address, text)
     session.quit()
 
     print("Mail Sent")
