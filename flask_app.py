@@ -5,17 +5,20 @@ from dotenv import load_dotenv, find_dotenv
 from werkzeug.exceptions import HTTPException
 from marshmallow import ValidationError
 from flask import Flask, render_template, jsonify, request
-from api.device_info.db import create_tables
+from api.device_info.db import create_tables as create_device_table
+from api.customer_emails.db import create_tables as create_email_table
 
 from api.tasks import energy_alert, register_energy_alert_task
 from api.validation_schema import EnergyAlertTaskSchema, GenReportSchema
 from api.utils import message_resp, send_mail, gen_report
 from api.device_info.routes import device_bp
-from api.device_info.controllers import *
+from api.device_info.controllers import get_device_info
+from api.customer_emails.routes import customer_bp
 
 
 app = Flask(__name__)
 app.register_blueprint(device_bp, url_prefix="/science/device")
+app.register_blueprint(customer_bp, url_prefix="/science/emails")
 
 # mail_list = [
 #     'phuong.huynhtuan@thecoffeehouse.vn',
@@ -25,7 +28,7 @@ app.register_blueprint(device_bp, url_prefix="/science/device")
 #     'luan.nguyen@seedcom.vn'
 # ]
 
-mail_list = ['nhat.thai@lab2lives.com']
+mail_list = ["nhat.thai@lab2lives.com"]
 
 
 @app.route("/science/")
@@ -38,9 +41,17 @@ def dailyReport():
     records = get_device_info()
     df_info = pd.DataFrame(
         records,
-        columns=['no', 'user_id', 'user_name', 'device_id', 'device_name', 'status', 'outdoor_unit']
+        columns=[
+            "no",
+            "user_id",
+            "user_name",
+            "device_id",
+            "device_name",
+            "status",
+            "outdoor_unit",
+        ],
     )
-    df_info = df_info.drop(columns='no')
+    df_info = df_info.drop(columns="no")
 
     request_data = request.args
     schema = GenReportSchema()
@@ -98,7 +109,8 @@ def global_error_handler(e):
 
 if __name__ == "__main__":
     load_dotenv(find_dotenv())
-    create_tables()
+    create_device_table()
+    create_email_table()
     server_port = os.environ.get("PORT", "8080")
     app.run(debug=False, port=server_port, host="0.0.0.0")
 
