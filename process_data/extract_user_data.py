@@ -2,6 +2,8 @@ import os
 import time
 import datetime
 
+import numpy as np
+
 from process_data.utils import *
 from api.tasks import get_sensor_data, get_energy_data, get_activities_data
 
@@ -84,6 +86,8 @@ def extract_user_data(user_id, device_id: str, track_day: str):
 
     df_act = pd.DataFrame(columns=cols)
     for i in range(len(df2)):
+        if df2['operation_mode'].iloc[i] == 'None':
+            continue
 
         if 'scheduler' in df2['event_type'].iloc[i]:
             df_act = pd.concat([df_act, pd.DataFrame([df2.iloc[i]], columns=cols)], ignore_index=True)

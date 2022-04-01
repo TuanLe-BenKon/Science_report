@@ -122,8 +122,7 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
                     power_status=power[df_activities["power"].iloc[i]],
                     op_mode=df_activities["operation_mode"].iloc[i],
                     op_time=act_time,
-                    configured_temp=str(int(df_activities["temperature"].iloc[i]))
-                    + "°C",
+                    configured_temp=str(int(df_activities["temperature"].iloc[i])) + "°C",
                     fan_speed=fan_speed,
                 )
             activities.append(row_act)
@@ -154,7 +153,7 @@ def send_mail(
 
     mail_content = """
             Kính gửi quý khách hàng, \n
-            Đây là email tự động từ hệ thống BenKon AI Care, quý khách hàng vui lòng liên hệ nhân viên BenKon để được hỗ trợ tốt nhất. 
+            Đây là email tự động từ hệ thống BenKon AI Care. Quý khách hàng vui lòng liên hệ nhân viên BenKon để được hỗ trợ tốt nhất. 
             Các khái niệm được dùng trong report:
             • Electricity Index (Wh): Chỉ số điện năng, tương tự như chỉ số điện của công tơ điện tử dùng để đo đếm điện năng tiêu thụ của máy điều hoà.
             • Power (W): Công suất tức thời, cho biết mức độ tiêu hao năng lượng của máy điều hoà .
@@ -201,7 +200,7 @@ def send_mail(
     session.starttls()
     session.login(sender_address, sender_pass)
     text = message.as_string()
-    session.sendmail(sender_address, receiver_address, text)
+    session.sendmail(sender_address, receiver_address + bcc, text)
     session.quit()
 
     print("Mail Sent")
