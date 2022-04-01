@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta
 
 import pandas as pd
 from dotenv import load_dotenv, find_dotenv
@@ -28,7 +29,7 @@ app.register_blueprint(customer_bp, url_prefix="/science/emails")
 #     'luan.nguyen@seedcom.vn'
 # ]
 
-mail_list = ["nhat.thai@lab2lives.com"]
+mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
 
 
 @app.route("/science/")
@@ -53,12 +54,11 @@ def dailyReport():
     )
     df_info = df_info.drop(columns="no")
 
-    request_data = request.args
-    schema = GenReportSchema()
+    data = request.args
     try:
-        data = schema.load(request_data)
-        user_id = data["user_id"]
-        track_day = data["track_day"]
+        user_id = "11294"
+        track_day = datetime.today() - timedelta(days=1)
+        track_day.strftime("%Y-%m-%d")
     except ValidationError as err:
         return message_resp(err.messages, 400)
 
