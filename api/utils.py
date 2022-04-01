@@ -18,8 +18,8 @@ from process_data.extract_user_data import *
 from process_data.chart import *
 
 power = {True: "ON", False: "OFF", None: "Không có"}
-local_chart_dir = os.getcwd() + "\\tmp\\chart\\"
-local_report_dir = os.getcwd() + "\\tmp\\report\\"
+local_chart_dir = os.path.join(os.getcwd(), "/tmp/chart")
+local_report_dir = os.path.join(os.getcwd(), "/tmp/report")
 
 
 def get_username(df_info: pd.DataFrame) -> Dict[Any, Any]:
@@ -122,7 +122,8 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
                     power_status=power[df_activities["power"].iloc[i]],
                     op_mode=df_activities["operation_mode"].iloc[i],
                     op_time=act_time,
-                    configured_temp=str(int(df_activities["temperature"].iloc[i])) + "°C",
+                    configured_temp=str(int(df_activities["temperature"].iloc[i]))
+                    + "°C",
                     fan_speed=fan_speed,
                 )
             activities.append(row_act)
@@ -186,7 +187,7 @@ def send_mail(
     # The body and the attachments for the mail
     message.attach(MIMEText(mail_content, "plain"))
 
-    with open(f"./tmp/report/BenKon_Daily_Report.pdf", "rb") as f:
+    with open(f"{local_report_dir}/BenKon_Daily_Report.pdf", "rb") as f:
         attach = MIMEApplication(f.read(), _subtype="pdf")
     attach.add_header(
         "Content-Disposition",
