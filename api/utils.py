@@ -201,7 +201,7 @@ def send_mail(
     session.starttls()
     session.login(sender_address, sender_pass)
     text = message.as_string()
-    session.sendmail(sender_address, receiver_address + bcc, text)
+    session.sendmail(sender_address, receiver_address, text)
     session.quit()
 
     print("Mail Sent")
