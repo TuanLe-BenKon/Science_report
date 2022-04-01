@@ -1,13 +1,13 @@
 import os
-
 import pandas as pd
+import datetime
 from dotenv import load_dotenv, find_dotenv
 from werkzeug.exceptions import HTTPException
 from marshmallow import ValidationError
 from flask import Flask, render_template, jsonify, request
+
 from api.device_info.db import create_tables as create_device_table
 from api.customer_emails.db import create_tables as create_email_table
-
 from api.tasks import energy_alert, register_energy_alert_task
 from api.validation_schema import EnergyAlertTaskSchema, GenReportSchema
 from api.utils import message_resp, send_mail, gen_report
@@ -53,17 +53,23 @@ def dailyReport():
     )
     df_info = df_info.drop(columns="no")
 
-    request_data = request.args
-    schema = GenReportSchema()
-    try:
-        data = schema.load(request_data)
-        user_id = data["user_id"]
-        track_day = data["track_day"]
-    except ValidationError as err:
-        return message_resp(err.messages, 400)
+    # request_data = request.args
+    # schema = GenReportSchema()
+    # try:
+    #     data = schema.load(request_data)
+    #     user_id = data["user_id"]
+    #     track_day = data["track_day"]
+    # except ValidationError as err:
+    #     return message_resp(err.messages, 400)
 
-    gen_report(df_info, user_id, track_day)
-    send_mail(df_info, user_id, track_day, mail_list)
+    date = datetime.datetime.now() - datetime.timedelta(days=1)
+    track_day = '{}-{:02d}-{:02d}'.format(date.year, date.month, date.day)
+
+    ids = ['10019', '11294', '11296']
+
+    for user_id in ids:
+        gen_report(df_info, user_id, track_day)
+        send_mail(df_info, user_id, track_day, mail_list)
 
     return message_resp()
 
