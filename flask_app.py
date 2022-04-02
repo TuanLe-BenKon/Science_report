@@ -1,9 +1,4 @@
 import os
-<<<<<<< HEAD
-from datetime import datetime, timedelta
-
-=======
->>>>>>> 42c364f7554963b8b3aedc26eaed5f169af20410
 import pandas as pd
 import datetime
 from dotenv import load_dotenv, find_dotenv
@@ -68,9 +63,9 @@ def dailyReport():
     #     return message_resp(err.messages, 400)
 
     date = datetime.datetime.now() - datetime.timedelta(days=1)
-    track_day = '{}-{:02d}-{:02d}'.format(date.year, date.month, date.day)
+    track_day = "{}-{:02d}-{:02d}".format(date.year, date.month, date.day)
 
-    ids = ['10019', '11294', '11296']
+    ids = ["10019", "11294", "11296"]
 
     for user_id in ids:
         gen_report(df_info, user_id, track_day)

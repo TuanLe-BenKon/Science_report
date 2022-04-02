@@ -5,3 +5,5 @@ https://06625019-2c46-4f9b-9a5a-80e783fa1409.mock.pstmn.io
 
 http://localhost:8080/science/v1/daily-report?user_id=11294&track_day=2022-03-24
 FLASK_ENV=development
+
+gcloud scheduler jobs create http daily-report-tch --schedule="* 7 * * *" --uri="https://dev-science-app-skxlbgreia-as.a.run.app/science/v1/daily-report" --http-method=GET --attempt-deadline=1800s --time-zone=Asia/Ho_Chi_Minh --location=asia-southeast1
