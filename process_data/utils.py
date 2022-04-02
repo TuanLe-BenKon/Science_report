@@ -10,8 +10,6 @@ OPS_MODES = {
     2: "Fan Only",
     3: "Heat",
     4: "Cool",
-    5: "None",
-    6: "None",
     7: "Auto"
 }
 
@@ -21,20 +19,17 @@ def parse_payload_str(row):
     # payload_dict = json.loads(payload)
     payload_dict = row.get("payload", {})
 
-    power = payload_dict.get("power")
-    temp = payload_dict.get("temperature")
-    fan_speed = payload_dict.get("fan_speed")
-    ops_mode = OPS_MODES.get(payload_dict.get("operation_mode"))
-    return pd.Series([power, temp, fan_speed, ops_mode])
-
-
-def parse_scheduler_state(row):
-    state_dict = row.get('state', {})
-
-    power = state_dict.get("power")
-    temp = state_dict.get("temperature")
-    fan_speed = state_dict.get("fan_speed")
-    ops_mode = OPS_MODES.get(state_dict.get("operation_mode"))
+    state_dict = payload_dict.get('state')
+    if state_dict is None:
+        power = payload_dict.get("power")
+        temp = payload_dict.get("temperature")
+        fan_speed = payload_dict.get("fan_speed")
+        ops_mode = OPS_MODES.get(payload_dict.get("operation_mode"))
+    else:
+        power = state_dict.get("power")
+        temp = state_dict.get("temperature")
+        fan_speed = state_dict.get("fan_speed")
+        ops_mode = OPS_MODES.get(state_dict.get("operation_mode"))
 
     return pd.Series([power, temp, fan_speed, ops_mode])
 

@@ -86,7 +86,7 @@ def extract_user_data(user_id, device_id: str, track_day: str):
 
     df_act = pd.DataFrame(columns=cols)
     for i in range(len(df2)):
-        if df2['operation_mode'].iloc[i] == 'None':
+        if df2['operation_mode'].iloc[i] is None:
             continue
 
         if 'scheduler' in df2['event_type'].iloc[i]:

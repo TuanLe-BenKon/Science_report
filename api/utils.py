@@ -97,8 +97,7 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
 
             # If event_type relates to scheduler
             if (
-                df_activities["event_type"].iloc[i] == "set_scheduler"
-                or df_activities["event_type"].iloc[i] == "update_scheduler"
+                df_activities["event_type"].iloc[i] == "add_scheduler"
                 or df_activities["event_type"].iloc[i] == "delete_scheduler"
             ):
                 row_act = ACActivity(
@@ -176,6 +175,11 @@ def send_mail(
         "dung.bui@lab2lives.com",
         "camp-testing-aaaaexabidfwdrbv3lndltt7q4@lab2lives.slack.com",
         "ann.tran@lab2lives.com",
+    ]
+
+    bcc_science = [
+        'tuan.le@lab2lives.com',
+        'nhat.thai@lab2lives.com'
     ]
 
     # Set up the MIME

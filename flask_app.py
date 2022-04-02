@@ -20,15 +20,16 @@ app = Flask(__name__)
 app.register_blueprint(device_bp, url_prefix="/science/device")
 app.register_blueprint(customer_bp, url_prefix="/science/emails")
 
-mail_list = [
-    'phuong.huynhtuan@thecoffeehouse.vn',
-    'an.nguyen@seedcom.vn',
-    'thinh.huynhhuy@thecoffeehouse.vn',
-    'hai.hoang@thecoffeehouse.vn',
-    'luan.nguyen@seedcom.vn'
-]
+# mail_list = [
+#     'phuong.huynhtuan@thecoffeehouse.vn',
+#     'an.nguyen@seedcom.vn',
+#     'thinh.huynhhuy@thecoffeehouse.vn',
+#     'hai.hoang@thecoffeehouse.vn',
+#     'luan.nguyen@seedcom.vn'
+# ]
 
 # mail_list = ["nhat.thai@lab2lives.com"]
+mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
 
 
 @app.route("/science/")
@@ -58,15 +59,15 @@ def dailyReport():
     # try:
     #     data = schema.load(request_data)
     #     user_id = data["user_id"]
-    #     track_day = data["track_day"]
+    #     track_day = data["track_day"]g
     # except ValidationError as err:
     #     return message_resp(err.messages, 400)
 
     date = datetime.datetime.now() - datetime.timedelta(days=1)
-    track_day = '{}-{:02d}-{:02d}'.format(date.year, date.month, date.day)
+    print(date)
+    track_day = "{}-{:02d}-{:02d}".format(date.year, date.month, date.day)
 
-    # ids = ['10019', '11294', '11296']
-    ids = ['11296']
+    ids = ["10019", "11294", "11296"]
 
     for user_id in ids:
         gen_report(df_info, user_id, track_day)
@@ -115,6 +116,7 @@ def global_error_handler(e):
 
 
 if __name__ == "__main__":
+    os.environ['TZ'] = 'Asia/Ho_Chi_Minh'
     load_dotenv(find_dotenv())
     create_device_table()
     create_email_table()
@@ -138,6 +140,7 @@ if __name__ == "__main__":
     # track_day = '2022-03-31'
     #
     # gen_report(df_info, user_id, track_day)
+    # send_mail(df_info, user_id, track_day, mail_list)
 
     server_port = os.environ.get("PORT", "8080")
     app.run(debug=False, port=server_port, host="0.0.0.0")
