@@ -12,7 +12,7 @@ from api.tasks import energy_alert, register_energy_alert_task
 from api.validation_schema import EnergyAlertTaskSchema, GenReportSchema
 from api.utils import message_resp, send_mail, gen_report
 from api.device_info.routes import device_bp
-from api.device_info.controllers import get_device_info
+from api.device_info.controllers import get_device_info, update_device_info
 from api.customer_emails.routes import customer_bp
 
 
@@ -142,6 +142,24 @@ if __name__ == "__main__":
     # gen_report(df_info, user_id, track_day)
     # send_mail(df_info, user_id, track_day, mail_list)
 
-    server_port = os.environ.get("PORT", "8080")
-    app.run(debug=False, port=server_port, host="0.0.0.0")
+    records = get_device_info()
+    df_info = pd.DataFrame(
+        records,
+        columns=[
+            "no",
+            "user_id",
+            "user_name",
+            "device_id",
+            "device_name",
+            "status",
+            "outdoor_unit",
+        ],
+    )
+    print(df_info[df_info['user_id'] == '10019'])
+    # update_device_info(7, '10019', 'The Coffee House Huỳnh Văn Bánh', '460707dd-f76d-4312-b0e5-dfdd06880cba', 'Máy Daikin âm trần', 1, 0)
+    # update_device_info(8, '10019', 'The Coffee House Huỳnh Văn Bánh', 'c570428b-ee27-4de5-b4d8-a78d16e841b4',
+    #                    'Cục nóng máy Daikin âm trần', 1, 1)
+
+    # server_port = os.environ.get("PORT", "8080")
+    # app.run(debug=False, port=server_port, host="0.0.0.0")
 
