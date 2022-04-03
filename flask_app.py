@@ -14,22 +14,12 @@ from api.utils import message_resp, send_mail, gen_report
 from api.device_info.routes import device_bp
 from api.device_info.controllers import get_device_info, update_device_info
 from api.customer_emails.routes import customer_bp
+from api.customer_emails.controllers import get_customer_emails, insert_customer_emails
 
 
 app = Flask(__name__)
 app.register_blueprint(device_bp, url_prefix="/science/device")
 app.register_blueprint(customer_bp, url_prefix="/science/emails")
-
-# mail_list = [
-#     'phuong.huynhtuan@thecoffeehouse.vn',
-#     'an.nguyen@seedcom.vn',
-#     'thinh.huynhhuy@thecoffeehouse.vn',
-#     'hai.hoang@thecoffeehouse.vn',
-#     'luan.nguyen@seedcom.vn'
-# ]
-
-# mail_list = ["nhat.thai@lab2lives.com"]
-mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
 
 
 @app.route("/science/")
@@ -67,11 +57,43 @@ def dailyReport():
     print(date)
     track_day = "{}-{:02d}-{:02d}".format(date.year, date.month, date.day)
 
-    ids = ["10019", "11294", "11296"]
+    ids = ["10019", "11294", "11296", "12", "590", "4619", "176", "26"]
+    # ids = ["11296", "12", "590", "4619", "176", "26"]
 
     for user_id in ids:
         gen_report(df_info, user_id, track_day)
-        send_mail(df_info, user_id, track_day, mail_list)
+
+        if user_id in ["10019", "11294", "11296"]:
+            mail_list = ['nhat.thai@lab2lives.com']
+            bcc_list = [
+                "tuan.le@lab2lives.com",
+                "hieu.tran@lab2lives.com",
+                "taddy@lab2lives.com",
+                "liam.thai@lab2lives.com",
+                "dung.bui@lab2lives.com",
+                "camp-testing-aaaaexabidfwdrbv3lndltt7q4@lab2lives.slack.com",
+                "ann.tran@lab2lives.com"
+            ]
+        else:
+            records = get_customer_emails()
+            df_mail = pd.DataFrame(
+                records,
+                columns=[
+                    "no",
+                    "user_id",
+                    "user_name",
+                    "external",
+                    "internal"
+                ],
+            )
+
+            s = df_mail[df_mail['user_id'] == user_id].iloc[0]['external']
+            mail_list = s[1:len(s) - 1].split(';')
+
+            s = df_mail[df_mail['user_id'] == user_id].iloc[0]['internal']
+            bcc_list = s[1:len(s) - 1].split(';')
+
+        send_mail(df_info, user_id, track_day, mail_list, bcc_list)
 
     return message_resp()
 
@@ -116,50 +138,10 @@ def global_error_handler(e):
 
 
 if __name__ == "__main__":
-    os.environ['TZ'] = 'Asia/Ho_Chi_Minh'
     load_dotenv(find_dotenv())
     create_device_table()
     create_email_table()
-
-    # records = get_device_info()
-    # df_info = pd.DataFrame(
-    #     records,
-    #     columns=[
-    #         "no",
-    #         "user_id",
-    #         "user_name",
-    #         "device_id",
-    #         "device_name",
-    #         "status",
-    #         "outdoor_unit",
-    #     ],
-    # )
-    # df_info = df_info.drop(columns="no")
-    #
-    # user_id = '10019'
-    # track_day = '2022-03-31'
-    #
-    # gen_report(df_info, user_id, track_day)
-    # send_mail(df_info, user_id, track_day, mail_list)
-
-    records = get_device_info()
-    df_info = pd.DataFrame(
-        records,
-        columns=[
-            "no",
-            "user_id",
-            "user_name",
-            "device_id",
-            "device_name",
-            "status",
-            "outdoor_unit",
-        ],
-    )
-    print(df_info[df_info['user_id'] == '10019'])
-    # update_device_info(7, '10019', 'The Coffee House Huỳnh Văn Bánh', '460707dd-f76d-4312-b0e5-dfdd06880cba', 'Máy Daikin âm trần', 1, 0)
-    # update_device_info(8, '10019', 'The Coffee House Huỳnh Văn Bánh', 'c570428b-ee27-4de5-b4d8-a78d16e841b4',
-    #                    'Cục nóng máy Daikin âm trần', 1, 1)
-
-    # server_port = os.environ.get("PORT", "8080")
-    # app.run(debug=False, port=server_port, host="0.0.0.0")
+    server_port = os.environ.get("PORT", "8080")
+    os.environ['TZ'] = 'Asia/Ho_Chi_Minh'
+    app.run(debug=False, port=server_port, host="0.0.0.0")
 
