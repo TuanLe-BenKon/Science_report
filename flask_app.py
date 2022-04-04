@@ -14,7 +14,7 @@ from api.utils import message_resp, send_mail, gen_report
 from api.device_info.routes import device_bp
 from api.device_info.controllers import get_device_info, update_device_info
 from api.customer_emails.routes import customer_bp
-from api.customer_emails.controllers import get_customer_emails, insert_customer_emails
+from api.customer_emails.controllers import get_customer_emails, insert_customer_emails, update_customer_emails
 
 
 app = Flask(__name__)
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     load_dotenv(find_dotenv())
     create_device_table()
     create_email_table()
-    server_port = os.environ.get("PORT", "8080")
     os.environ['TZ'] = 'Asia/Ho_Chi_Minh'
+    server_port = os.environ.get("PORT", "8080")
     app.run(debug=False, port=server_port, host="0.0.0.0")
 
