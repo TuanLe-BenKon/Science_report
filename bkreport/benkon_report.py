@@ -126,7 +126,13 @@ class BenKonReportData:
 
 
 class BenKonReport:
-    def __init__(self, path: str, data: "list[BenKonReportData]", config: ReportConfig = ReportConfig()):
+    def __init__(self,
+                 path: str,
+                 isGenSummaryPage: bool,
+                 url_summary_chart: str,
+                 data: "list[BenKonReportData]",
+                 config: ReportConfig = ReportConfig()
+                 ):
         # Create path if not exists
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -136,6 +142,7 @@ class BenKonReport:
         self.conf.registerFont()
         self.path = path
         self.data = data
+        self.url_summary_chart = url_summary_chart
         self.styleSheet = getSampleStyleSheet()
         self.elements = []
 
@@ -149,6 +156,9 @@ class BenKonReport:
         self.colorBKDarkGray = Color((183.0/255), (143.0/255), (109.0/255), 1)
         self.colorBKDark = Color((31.0/255), (74.0/255), (154.0/255), 1)
 
+        # Create page content
+        if isGenSummaryPage:
+            self.summaryPage()
         for idx in range(len(self.data)):
             self.firstPage(idx)
             self.activityPage(idx)
@@ -158,7 +168,28 @@ class BenKonReport:
             path, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm,
             topMargin=1.5*cm, bottomMargin=1.5*cm)
         self.doc.multiBuild(self.elements, canvasmaker=FooterCanvas)
-        foo = [1, 2, 3, 4]
+
+    def summaryPage(self):
+        # Pie chart title
+        self.elements.append(Spacer(10, 1 * cm))
+        chartTitleText = "Tổng điện năng tiêu thụ và thời gian hoạt động (3 ngày gần nhất)"
+        chartTitleStyle = ParagraphStyle(
+            name="chartTitleStyle", fontName="NotoSans", fontSize=14, alignment=TA_CENTER)
+        chartTitle = Paragraph("<b>%s</b>" % chartTitleText, chartTitleStyle)
+        self.elements.append(chartTitle)
+
+        # Pie chart image
+        if self.url_summary_chart == '':
+            pass
+        else:
+            imgChart = Image(self.url_summary_chart)
+            chartSize = self.conf.pageWidth
+            imgChart.drawHeight = chartSize * 1.1
+            imgChart.drawWidth = chartSize
+            imgChart.hAlign = 'CENTER'
+            self.elements.append(imgChart)
+
+        self.elements.append(PageBreak())
 
     def firstPage(self, dataIndex: int):
 

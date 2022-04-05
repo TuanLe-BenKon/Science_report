@@ -38,7 +38,28 @@ def get_energy_data(device_id: UUID, user_id: int, init_timestamp: int, duration
         df = pd.read_sql(sql_statement, con=engine)
     except:
         df = pd.DataFrame()
+    return df
 
+
+def get_energy_data_test(device_id: UUID, init_timestamp: int, duration: int) -> pd.DataFrame:
+    DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
+    engine = create_engine(DATABASE_URL)
+
+    bounded_timestamp = init_timestamp + 60 * 60 * duration
+    sql_statement = """
+                SELECT e.device_id, e.power, e.energy, e.timestamp
+                FROM public.energy_data as e 
+                WHERE e.device_id='{}' 
+                    AND {} <= e.timestamp 
+                    AND e.timestamp <= {}
+                ORDER BY e.timestamp;
+            """.format(
+        device_id, init_timestamp, bounded_timestamp
+    )
+    try:
+        df = pd.read_sql(sql_statement, con=engine)
+    except:
+        df = pd.DataFrame()
     return df
 
 

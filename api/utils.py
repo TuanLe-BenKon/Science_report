@@ -1,6 +1,7 @@
 import os
 from typing import List, Dict, Any
 
+import numpy as np
 import pandas as pd
 from flask import Response, jsonify
 import io
@@ -53,6 +54,8 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
     device_name = get_device_name(df_info)
     device_id_list = get_device_list(df_info, user_id)
 
+    energy_list = []
+    device_list = []
     data = []
 
     if os.path.exists(local_chart_dir):
@@ -69,12 +72,16 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
         )
 
         if (
-            len(df_sensor) == 0
-            or len(df_energy) == 0
-            or np.isnan(df_energy["energy"].max())
+                (len(df_sensor) == 0
+                 and len(df_energy) == 0)
+                or np.isnan(df_energy["energy"].max())
         ):
             pass
         else:
+            if int(df_info[df_info['device_id'] == device_id]['outdoor_unit']) == 1:
+                energy_list.append(get_energy_consumption(df_energy)/1000)
+                device_list.append(device_id)
+
             export_chart(
                 local_chart_dir,
                 device_name,
@@ -97,8 +104,8 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
 
             # If event_type relates to scheduler
             if (
-                df_activities["event_type"].iloc[i] == "add_scheduler"
-                or df_activities["event_type"].iloc[i] == "delete_scheduler"
+                    df_activities["event_type"].iloc[i] == "add_scheduler"
+                    or df_activities["event_type"].iloc[i] == "delete_scheduler"
             ):
                 row_act = ACActivity(
                     type=df_activities["event_type"].iloc[i],
@@ -121,16 +128,17 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
                     power_status=power[df_activities["power"].iloc[i]],
                     op_mode=df_activities["operation_mode"].iloc[i],
                     op_time=act_time,
-                    configured_temp=str(int(df_activities["temperature"].iloc[i]))
-                    + "°C",
+                    configured_temp=str(int(df_activities["temperature"].iloc[i])) + "°C",
                     fan_speed=fan_speed,
                 )
             activities.append(row_act)
 
+        # Get chart URL
         chart_url = f"{local_chart_dir}/chart_{device_name[device_id]}.png"
         if not os.path.exists(chart_url):
             chart_url = ""
 
+        # Gen report's page for each device
         data_report = BenKonReportData(
             user=username[user_id],
             device=device_name[device_id],
@@ -141,14 +149,35 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
         )
         data.append(data_report)
 
+    if user_id in ["10019", "11294", "11296", "11291", "11290", "10940"]:
+        isGenSummaryPage = False
+    else:
+        isGenSummaryPage = True
+        export_summary_chart(
+            local_chart_dir,
+            user_id,
+            device_list,
+            energy_list,
+            device_name,
+            track_day
+        )
+
+    summary_chart_url = local_chart_dir + '/SummaryChart_' + track_day + '.png'
+    if not os.path.exists(summary_chart_url):
+        summary_chart_url = ''
+
     os.makedirs(f"{local_report_dir}", exist_ok=True)
-    report = BenKonReport(f"{local_report_dir}/BenKon_Daily_Report.pdf", data=data)
+    BenKonReport(
+        f"{local_report_dir}/BenKon_Daily_Report.pdf",
+        isGenSummaryPage=isGenSummaryPage,
+        url_summary_chart=summary_chart_url,
+        data=data
+    )
 
 
 def send_mail(
-    df_info: pd.DataFrame, user_id: str, track_day: str, list_mail: List[str], bcc: List[str]
+        df_info: pd.DataFrame, user_id: str, track_day: str, list_mail: List[str], bcc: List[str]
 ) -> None:
-
     username = get_username(df_info)
 
     mail_content = """
@@ -167,16 +196,6 @@ def send_mail(
     sender_pass = "BenKonCS@123"
 
     receiver_address = list_mail
-
-    # bcc = [
-    #     "tuan.le@lab2lives.com",
-    #     "hieu.tran@lab2lives.com",
-    #     "taddy@lab2lives.com",
-    #     "liam.thai@lab2lives.com",
-    #     "dung.bui@lab2lives.com",
-    #     "camp-testing-aaaaexabidfwdrbv3lndltt7q4@lab2lives.slack.com",
-    #     "ann.tran@lab2lives.com",
-    # ]
 
     # Set up the MIME
     message = MIMEMultipart()

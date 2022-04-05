@@ -6,6 +6,7 @@ from api.customer_emails.controllers import (
     get_customer_emails,
     insert_customer_emails,
     delete_customer_emails,
+    update_customer_emails
 )
 from api.customer_emails.validation import CustomerEmailSchema
 from api.utils import message_resp
@@ -53,7 +54,7 @@ def update_customer():
         user_name = data["user_name"]
         external = data["external"]
         internal = data["internal"]
-        res = delete_customer_emails(id, user_id, user_name, external, internal)
-        return res
+        res = update_customer_emails(id, user_id, user_name, external, internal)
+        return jsonify(res)
     except ValidationError as err:
         return message_resp(err.messages, 400)

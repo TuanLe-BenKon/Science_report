@@ -1,6 +1,9 @@
 import os
+import time
+
 import pandas as pd
 import datetime
+import pytz
 from dotenv import load_dotenv, find_dotenv
 from werkzeug.exceptions import HTTPException
 from marshmallow import ValidationError
@@ -8,13 +11,13 @@ from flask import Flask, render_template, jsonify, request
 
 from api.device_info.db import create_tables as create_device_table
 from api.customer_emails.db import create_tables as create_email_table
-from api.tasks import energy_alert, register_energy_alert_task
+from api.tasks import *
 from api.validation_schema import EnergyAlertTaskSchema, GenReportSchema
 from api.utils import message_resp, send_mail, gen_report
 from api.device_info.routes import device_bp
-from api.device_info.controllers import get_device_info, update_device_info
+from api.device_info.controllers import *
 from api.customer_emails.routes import customer_bp
-from api.customer_emails.controllers import get_customer_emails, insert_customer_emails, update_customer_emails
+from api.customer_emails.controllers import *
 
 
 app = Flask(__name__)
@@ -44,35 +47,32 @@ def dailyReport():
     )
     df_info = df_info.drop(columns="no")
 
-    # request_data = request.args
-    # schema = GenReportSchema()
-    # try:
-    #     data = schema.load(request_data)
-    #     user_id = data["user_id"]
-    #     track_day = data["track_day"]g
-    # except ValidationError as err:
-    #     return message_resp(err.messages, 400)
-
-    date = datetime.datetime.now() - datetime.timedelta(days=1)
+    IST = pytz.timezone('Asia/Ho_Chi_Minh')
+    date = datetime.datetime.now(IST) - datetime.timedelta(days=1)
     print(date)
     track_day = "{}-{:02d}-{:02d}".format(date.year, date.month, date.day)
 
-    ids = ["10019", "11294", "11296", "12", "590", "4619", "176", "26"]
-    # ids = ["11296", "12", "590", "4619", "176", "26"]
+    ids = ["10019", "11294", "11296", "10940", "12", "590", "4619", "176", "26", "11301", "11291", "11303"]
 
     for user_id in ids:
-        gen_report(df_info, user_id, track_day)
 
-        if user_id in ["10019", "11294", "11296"]:
+        if user_id in ["10019", "11294", "11296", "10940", "11301", "11303"]:
             mail_list = ['nhat.thai@lab2lives.com']
             bcc_list = [
-                "tuan.le@lab2lives.com",
-                "hieu.tran@lab2lives.com",
-                "taddy@lab2lives.com",
-                "liam.thai@lab2lives.com",
-                "dung.bui@lab2lives.com",
-                "camp-testing-aaaaexabidfwdrbv3lndltt7q4@lab2lives.slack.com",
-                "ann.tran@lab2lives.com"
+                # "tuan.le@lab2lives.com",
+                # "hieu.tran@lab2lives.com",
+                # "taddy@lab2lives.com",
+                # "liam.thai@lab2lives.com",
+                # "dung.bui@lab2lives.com",
+                # "ann.tran@lab2lives.com"
+            ]
+        elif user_id in ["11291"]:
+            mail_list = ['nhat.thai@lab2lives.com']
+            bcc_list = [
+                # "tuan.le@lab2lives.com",
+                # "hieu.tran@lab2lives.com",
+                # "liam.thai@lab2lives.com",
+                # "ann.tran@lab2lives.com"
             ]
         else:
             records = get_customer_emails()
@@ -93,6 +93,10 @@ def dailyReport():
             s = df_mail[df_mail['user_id'] == user_id].iloc[0]['internal']
             bcc_list = s[1:len(s) - 1].split(';')
 
+        print(mail_list)
+        print(bcc_list)
+
+        gen_report(df_info, user_id, track_day)
         send_mail(df_info, user_id, track_day, mail_list, bcc_list)
 
     return message_resp()
@@ -141,7 +145,5 @@ if __name__ == "__main__":
     load_dotenv(find_dotenv())
     create_device_table()
     create_email_table()
-    os.environ['TZ'] = 'Asia/Ho_Chi_Minh'
     server_port = os.environ.get("PORT", "8080")
     app.run(debug=False, port=server_port, host="0.0.0.0")
-

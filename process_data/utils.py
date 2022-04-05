@@ -178,25 +178,3 @@ def get_working_time(df):
             working_time += (df_working['timestamp'].iloc[i + 1] - df_working['timestamp'].iloc[i]).total_seconds()
 
     return working_time
-
-
-## Cut working time
-
-def calc_energy_saving(df, track_day, hour_start=8, hour_end=21):
-
-    if len(df) == 0:
-        return 0
-
-    date = pd.to_datetime(track_day)
-    start_time = date + pd.to_timedelta(hour_start, 'H')
-    end_time = date + pd.to_timedelta(hour_end, 'H')
-
-    df = df[(df['timestamp'] >= start_time) & (df['timestamp'] <= end_time)]
-    
-    max_e = df['energy'].max()
-    min_e = df['energy'].min()
-
-    if np.isnan(max_e) or np.isnan(min_e):
-        return 0
-    else:
-        return max_e - min_e

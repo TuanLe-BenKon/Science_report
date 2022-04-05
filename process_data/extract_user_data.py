@@ -104,3 +104,25 @@ def extract_user_data(user_id, device_id: str, track_day: str):
     df_activities = df_act
 
     return df_sensor, df_energy, df_activities
+
+
+# Get preprocess energy data
+def extract_energy_data(user_id, device_id: str, track_day: str):
+    df_energy = get_energy_data(device_id, user_id, convert_to_unix_timestamp(track_day), 24)
+
+    ## Change UTC Time to Timestamp and Sort dataframe
+    df_energy = df_energy[['timestamp', 'power', 'energy']]
+    df_energy['timestamp'] = pd.to_datetime(df_energy['timestamp'].apply(lambda x: dt.fromtimestamp(x)))
+    df_energy.sort_values(by='timestamp', inplace=True)
+    df_energy.reset_index(drop=True, inplace=True)
+
+    ## DROP DUPLICATED
+    df_energy = drop_duplicated(df_energy)
+
+    ## RESET ENERGY
+    df_energy = process_reset(df_energy)
+
+    ## MISSING DATA
+    df_energy = process_missing_data(df_energy, 'energy')
+
+    return df_energy

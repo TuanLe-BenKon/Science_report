@@ -1,9 +1,15 @@
+from typing import List
+
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime
+import seaborn as sns
 import pandas as pd
 
 from process_data.utils import *
+from process_data.extract_user_data import extract_energy_data
+
+alpha = [1, 0.8, 0.6]
 
 
 # Draw chart
@@ -115,3 +121,318 @@ def export_chart(bg_dir, device_name, device_id, df_sensor, df_energy, df_activi
     fig.savefig(f'{bg_dir}/chart_{device_name[device_id]}.png')
     plt.close()
     # plt.show()
+
+
+## Energy Pie chart
+def func(pct):
+    return "{:.1f}%".format(pct)
+
+
+# def export_pie_chart_energy_consumption(bg_dir, device_list, energy_list, track_day):
+#     # Wedge properties
+#     wp = {'linewidth': 2, 'edgecolor': "black"}
+#
+#     # Creating plot
+#     fig, ax = plt.subplots(figsize=(15, 10), facecolor='w')
+#     wedges, texts, autotexts = ax.pie(energy_list,
+#                                       autopct=lambda pct: func(pct, energy_list),
+#                                       labels=device_list,
+#                                       startangle=90,
+#                                       wedgeprops=wp,
+#                                       textprops={'fontsize': 14}
+#                                       )
+#
+#     # Adding legend
+#     ax.legend(wedges, device_list,
+#               title="Device List",
+#               loc="upper right",
+#               bbox_to_anchor=(1.6, 1.25),
+#               fontsize=14)
+#
+#     plt.setp(autotexts, size=12, weight="bold")
+#     ax.set_title(
+#         'Total Energy Consumption ({}): {:.2f} kWh'.format(track_day, np.sum(energy_list)), fontsize=16)
+#
+#     plt.savefig(bg_dir + '/EnergyPieChart_' + track_day + '.png')
+#     plt.show()
+#
+#
+# def export_energy_consumption_and_working_time_chart(bg_dir, user_id, device_list, track_day, device_name):
+#     date1 = pd.to_datetime(track_day)
+#     date2 = date1 - datetime.timedelta(days=1)
+#     date3 = date1 - datetime.timedelta(days=2)
+#
+#     track_day_2 = '{}-{:02d}-{:02d}'.format(date2.year, date2.month, date2.day)
+#     track_day_3 = '{}-{:02d}-{:02d}'.format(date3.year, date3.month, date3.day)
+#
+#     e = [[], [], []]
+#     t = [[], [], []]
+#     label = []
+#
+#     for device_id in device_list:
+#         df_energy_1 = extract_energy_data(user_id, device_id, track_day)
+#         df_energy_2 = extract_energy_data(user_id, device_id, track_day_2)
+#         df_energy_3 = extract_energy_data(user_id, device_id, track_day_3)
+#
+#         ec1 = get_energy_consumption(df_energy_1) / 1000
+#         ec2 = get_energy_consumption(df_energy_2) / 1000
+#         ec3 = get_energy_consumption(df_energy_3) / 1000
+#
+#         wt1 = get_working_time(df_energy_1) / 3600
+#         wt2 = get_working_time(df_energy_2) / 3600
+#         wt3 = get_working_time(df_energy_3) / 3600
+#
+#         if not np.isnan(ec1):
+#             e[0].append(ec1)
+#         else:
+#             e[0].append(0)
+#
+#         if not np.isnan(ec2):
+#             e[1].append(ec2)
+#         else:
+#             e[1].append(0)
+#
+#         if not np.isnan(ec3):
+#             e[2].append(ec3)
+#         else:
+#             e[2].append(0)
+#
+#         if not np.isnan(wt1):
+#             t[0].append(wt1)
+#         else:
+#             t[0].append(0)
+#
+#         if not np.isnan(wt2):
+#             t[1].append(wt2)
+#         else:
+#             t[1].append(0)
+#
+#         if not np.isnan(wt3):
+#             t[2].append(wt3)
+#         else:
+#             t[2].append(0)
+#
+#         label.append(device_name[device_id])
+#
+#     df_energy_consumption = pd.DataFrame({
+#         'Device Name': label,
+#         'Hôm trước': e[2],
+#         'Hôm qua': e[1],
+#         'Hôm nay': e[0]
+#     })
+#
+#     df_working_time = pd.DataFrame({
+#         'Device Name': label,
+#         'Hôm trước': t[2],
+#         'Hôm qua': t[1],
+#         'Hôm nay': t[0]
+#     })
+#
+#     df_energy_consumption = pd.melt(df_energy_consumption, id_vars="Device Name", var_name="Track Day",
+#                                     value_name='Energy Consumption (kWh)')
+#     df_working_time = pd.melt(df_working_time, id_vars="Device Name", var_name="Track Day",
+#                               value_name='Working Time (Hours)')
+#
+#     fig, axs = plt.subplots(2, 1, sharex=True, figsize=(15, 12))
+#     fig.subplots_adjust(hspace=0.05)
+#
+#     g = sns.barplot(
+#         ax=axs[0],
+#         x='Device Name',
+#         y='Energy Consumption (kWh)',
+#         hue='Track Day',
+#         data=df_energy_consumption,
+#         color='green'
+#     )
+#     for al, bar in zip(alpha, axs[0].containers[0]):
+#         bar.set_alpha(alpha=al)
+#     axs[0].get_legend().remove()
+#
+#     g.set(xlabel=None)
+#     ax = axs[0]
+#     for p in ax.patches:
+#         axs[0].text(p.get_x() + p.get_width() / 2., p.get_height(), '%.2f' % p.get_height(), fontsize=12, color='red',
+#                     ha='center', va='bottom')
+#
+#     axs[1].set_ylim(0, 24)
+#     sns.barplot(
+#         ax=axs[1],
+#         x='Device Name',
+#         y='Working Time (Hours)',
+#         hue='Track Day',
+#         data=df_working_time,
+#         color='green'
+#     )
+#     for al, bar in zip(alpha, axs[1].containers[0]):
+#         bar.set_alpha(alpha=al)
+#
+#     ax = axs[1]
+#     for p in ax.patches:
+#         axs[1].text(p.get_x() + p.get_width() / 2., p.get_height(), '%.2f' % p.get_height(), fontsize=12, color='red',
+#                     ha='center', va='bottom')
+#
+#     plt.xticks(rotation=45)
+#     plt.legend(bbox_to_anchor=(0.5, 2.4), loc='upper center', fontsize=14)
+#
+#     plt.savefig(bg_dir + '/Last3daysBarChart_' + track_day + '.png')
+#     plt.show()
+
+
+def export_summary_chart(
+        bg_dir: str,
+        user_id: str,
+        device_list: List[str],
+        energy_list: List[float],
+        device_name,
+        track_day: str
+):
+    date1 = pd.to_datetime(track_day)
+    date2 = date1 - datetime.timedelta(days=1)
+    date3 = date1 - datetime.timedelta(days=2)
+
+    track_day_2 = '{}-{:02d}-{:02d}'.format(date2.year, date2.month, date2.day)
+    track_day_3 = '{}-{:02d}-{:02d}'.format(date3.year, date3.month, date3.day)
+
+    e = [[], [], []]
+    t = [[], [], []]
+    label = []
+
+    for device_id in device_list:
+        df_energy_1 = extract_energy_data(user_id, device_id, track_day)
+        df_energy_2 = extract_energy_data(user_id, device_id, track_day_2)
+        df_energy_3 = extract_energy_data(user_id, device_id, track_day_3)
+
+        ec1 = get_energy_consumption(df_energy_1) / 1000
+        ec2 = get_energy_consumption(df_energy_2) / 1000
+        ec3 = get_energy_consumption(df_energy_3) / 1000
+
+        wt1 = get_working_time(df_energy_1) / 3600
+        wt2 = get_working_time(df_energy_2) / 3600
+        wt3 = get_working_time(df_energy_3) / 3600
+
+        if not np.isnan(ec1):
+            e[0].append(ec1)
+        else:
+            e[0].append(0)
+
+        if not np.isnan(ec2):
+            e[1].append(ec2)
+        else:
+            e[1].append(0)
+
+        if not np.isnan(ec3):
+            e[2].append(ec3)
+        else:
+            e[2].append(0)
+
+        if not np.isnan(wt1):
+            t[0].append(wt1)
+        else:
+            t[0].append(0)
+
+        if not np.isnan(wt2):
+            t[1].append(wt2)
+        else:
+            t[1].append(0)
+
+        if not np.isnan(wt3):
+            t[2].append(wt3)
+        else:
+            t[2].append(0)
+
+        label.append(device_name[device_id])
+
+    df_energy_consumption = pd.DataFrame({
+        'Device Name': label,
+        'Hôm trước': e[2],
+        'Hôm qua': e[1],
+        'Hôm nay': e[0]
+    })
+
+    df_working_time = pd.DataFrame({
+        'Device Name': label,
+        'Hôm trước': t[2],
+        'Hôm qua': t[1],
+        'Hôm nay': t[0]
+    })
+
+    df_energy_consumption = pd.melt(df_energy_consumption, id_vars="Device Name", var_name="Track Day",
+                                    value_name='Energy Consumption (kWh)')
+    df_working_time = pd.melt(df_working_time, id_vars="Device Name", var_name="Track Day",
+                              value_name='Working Time (Hours)')
+
+    # Wedge properties
+    wp = {'linewidth': 2, 'edgecolor': "black"}
+
+    fig, axs = plt.subplots(3, 1, sharex=True, figsize=(15, 18))
+    fig.subplots_adjust(hspace=0.05)
+
+    wedges, texts, autotexts = axs[0].pie(
+        energy_list,
+        autopct=lambda pct: func(pct),
+        startangle=90,
+        wedgeprops=wp,
+        textprops={'fontsize': 14},
+        center=(0.4, 0.5)
+    )
+
+    label_list = []
+    idx = 0
+    for lab in label:
+        label_list.append(lab + ' (' + str(energy_list[idx]) + 'kWh)')
+        idx += 1
+
+    # Adding legend
+    axs[0].legend(
+        wedges,
+        label_list,
+        title="Device List",
+        loc="upper right",
+        bbox_to_anchor=(1, 0.75),
+        fontsize=14
+    )
+
+    plt.setp(autotexts, size=12, weight="bold")
+    axs[0].set_title(
+        'Total Energy Consumption ({}): {:.2f} kWh'.format(track_day, np.sum(energy_list)), fontsize=16)
+
+    g = sns.barplot(
+        ax=axs[1],
+        x='Device Name',
+        y='Energy Consumption (kWh)',
+        hue='Track Day',
+        data=df_energy_consumption,
+        color='green'
+    )
+    for al, bar in zip(alpha, axs[1].containers[0]):
+        bar.set_alpha(alpha=al)
+    axs[1].get_legend().remove()
+
+    g.set(xlabel=None)
+    ax = axs[1]
+    for p in ax.patches:
+        axs[1].text(p.get_x() + p.get_width() / 2., p.get_height(), '%.2f' % p.get_height(), fontsize=12, color='red',
+                    ha='center', va='bottom')
+
+    axs[2].set_ylim(0, 24)
+    sns.barplot(
+        ax=axs[2],
+        x='Device Name',
+        y='Working Time (Hours)',
+        hue='Track Day',
+        data=df_working_time,
+        color='green'
+    )
+    for al, bar in zip(alpha, axs[2].containers[0]):
+        bar.set_alpha(alpha=al)
+
+    ax = axs[2]
+    for p in ax.patches:
+        axs[2].text(p.get_x() + p.get_width() / 2., p.get_height(), '%.2f' % p.get_height(), fontsize=12, color='red',
+                    ha='center', va='bottom')
+
+    plt.xticks(rotation=45)
+    plt.legend(fontsize=14)
+
+    plt.savefig(bg_dir + '/SummaryChart_' + track_day + '.png')
+    plt.close()
