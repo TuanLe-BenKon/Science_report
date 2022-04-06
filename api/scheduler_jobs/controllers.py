@@ -35,7 +35,7 @@ def create_scheduler_job() -> Response:
     return message_resp()
 
 
-def delete_scheduler_job(job_id):
+def delete_scheduler_job(job_id: str) -> Response:
     """Delete a job via the Cloud Scheduler API"""
     client = scheduler.CloudSchedulerClient()
     project_id = os.environ.get("GCP_PROJECT_ID")
