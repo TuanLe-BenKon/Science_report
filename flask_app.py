@@ -130,12 +130,12 @@ def energy_alert_task():
         return message_resp(err.messages, 400)
 
 
-# @app.errorhandler(Exception)
-# def global_error_handler(e):
-#     code = 400
-#     if isinstance(e, HTTPException):
-#         code = e.code
-#     return jsonify(error="Something went wrong"), code
+@app.errorhandler(Exception)
+def global_error_handler(e):
+    code = 400
+    if isinstance(e, HTTPException):
+        code = e.code
+    return jsonify(error="Something went wrong"), code
 
 
 if __name__ == "__main__":
@@ -143,4 +143,4 @@ if __name__ == "__main__":
     create_device_table()
     create_email_table()
     server_port = os.environ.get("PORT", "8080")
-    app.run(debug=True, port=server_port, host="0.0.0.0")
+    app.run(debug=False, port=server_port, host="0.0.0.0")

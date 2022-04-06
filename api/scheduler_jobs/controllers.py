@@ -8,13 +8,13 @@ from flask import Response
 from api.utils import message_resp
 
 
-def create_scheduler_job(user_id) -> Response:
+def create_scheduler_job() -> Response:
     """Create a job with an App Engine target via the Cloud Scheduler API"""
     client = scheduler.CloudSchedulerClient()
     tz = os.environ.get("TZ")
     project_id = os.environ.get("GCP_PROJECT_ID")
     location_id = os.environ.get("GCP_LOCATION")
-    url = os.environ.get("DEV_SCIENCE_URL") + user_id
+    url = os.environ.get("DEV_SCIENCE_URL")
     parent = f"projects/{project_id}/locations/{location_id}"
 
     duration = Duration()
