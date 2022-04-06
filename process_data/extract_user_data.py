@@ -1,7 +1,6 @@
 import os
 import time
 import datetime
-
 import numpy as np
 
 from process_data.utils import *
@@ -24,7 +23,9 @@ def extract_user_data(user_id, device_id: str, track_day: str):
     '''
         Process data frame sensor
     '''
+    t_sensor = time.time()
     df_sensor = get_sensor_data(device_id, user_id, convert_to_unix_timestamp(track_day), 24)
+    t_sensor = time.time() - t_sensor
 
     ## Change UTC Time to Timestamp and Sort dataframe
     df_sensor = df_sensor[['timestamp', 'temperature', 'humidity']]
@@ -45,7 +46,9 @@ def extract_user_data(user_id, device_id: str, track_day: str):
     '''
         Process data frame energy
     '''
+    t_energy = time.time()
     df_energy = get_energy_data(device_id, user_id, convert_to_unix_timestamp(track_day), 24)
+    t_energy = time.time() - t_energy
 
     ## Change UTC Time to Timestamp and Sort dataframe
     df_energy = df_energy[['timestamp', 'power', 'energy']]
@@ -68,7 +71,11 @@ def extract_user_data(user_id, device_id: str, track_day: str):
     '''
     cols = ['event_type', 'timestamp', 'power', 'temperature', 'fan_speed', 'operation_mode']
 
+    t_act = time.time()
     df_activities = get_activities_data(device_id, user_id, convert_to_unix_timestamp(track_day), 24)
+    t_act = time.time() - t_act
+
+    print('Total query time of device ', user_id, ' = ', t_sensor + t_energy + t_act)
 
     ## RESAMPLE
     if len(df_activities) > 0:

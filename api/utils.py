@@ -104,8 +104,7 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
 
             # If event_type relates to scheduler
             if (
-                    df_activities["event_type"].iloc[i] == "add_scheduler"
-                    or df_activities["event_type"].iloc[i] == "delete_scheduler"
+                    df_activities["event_type"].iloc[i] == "delete_scheduler"
             ):
                 row_act = ACActivity(
                     type=df_activities["event_type"].iloc[i],
@@ -153,14 +152,18 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
         isGenSummaryPage = False
     else:
         isGenSummaryPage = True
-        export_summary_chart(
-            local_chart_dir,
-            user_id,
-            device_list,
-            energy_list,
-            device_name,
-            track_day
-        )
+
+        if len(device_list) == 0 or len(energy_list) == 0:
+            pass
+        else:
+            export_summary_chart(
+                local_chart_dir,
+                user_id,
+                device_list,
+                energy_list,
+                device_name,
+                track_day
+            )
 
     summary_chart_url = local_chart_dir + '/SummaryChart_' + track_day + '.png'
     if not os.path.exists(summary_chart_url):

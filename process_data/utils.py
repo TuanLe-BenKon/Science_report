@@ -162,7 +162,7 @@ def process_missing_data(df, data_type):
 
 ## Get Energy Consumption
 def get_energy_consumption(df):
-    return df['energy'].max() - df['energy'].min()
+    return df['energy'].iloc[-1] - df['energy'].iloc[0]
 
 
 ## Get Working Time
