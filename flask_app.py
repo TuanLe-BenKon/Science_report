@@ -69,39 +69,14 @@ def dailyReport():
     print(date)
     track_day = "{}-{:02d}-{:02d}".format(date.year, date.month, date.day)
 
-    ids = [
-        "10019",
-        "11294",
-        "11296",
-        "10940",
-        "12",
-        "590",
-        "4619",
-        "176",
-        "26",
-        "11301",
-        "11291",
-        "11303",
-    ]
+    ids = ["10019"]
     for user_id in ids:
         if user_id in ["10019", "11294", "11296", "10940", "11301"]:
             mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
-            bcc_list = [
-                "tuan.le@lab2lives.com",
-                "hieu.tran@lab2lives.com",
-                "taddy@lab2lives.com",
-                "liam.thai@lab2lives.com",
-                "dung.bui@lab2lives.com",
-                "ann.tran@lab2lives.com",
-            ]
+            bcc_list = []
         elif user_id in ["11291"]:
             mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
-            bcc_list = [
-                "tuan.le@lab2lives.com",
-                "hieu.tran@lab2lives.com",
-                "liam.thai@lab2lives.com",
-                "ann.tran@lab2lives.com",
-            ]
+            bcc_list = []
         else:
             records = get_customer_emails()
             df_mail = pd.DataFrame(
@@ -149,12 +124,12 @@ def energy_alert_task():
         return message_resp(err.messages, 400)
 
 
-@app.errorhandler(Exception)
-def global_error_handler(e):
-    code = 400
-    if isinstance(e, HTTPException):
-        code = e.code
-    return jsonify(error="Something went wrong"), code
+# @app.errorhandler(Exception)
+# def global_error_handler(e):
+#     code = 400
+#     if isinstance(e, HTTPException):
+#         code = e.code
+#     return jsonify(error="Something went wrong"), code
 
 
 if __name__ == "__main__":
@@ -162,4 +137,4 @@ if __name__ == "__main__":
     create_device_table()
     create_email_table()
     server_port = os.environ.get("PORT", "8080")
-    app.run(debug=False, port=server_port, host="0.0.0.0")
+    app.run(debug=True, port=server_port, host="0.0.0.0")

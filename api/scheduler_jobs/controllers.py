@@ -3,18 +3,20 @@ import os
 from google.cloud import scheduler
 from google.protobuf.duration_pb2 import Duration
 from google.api_core.exceptions import GoogleAPICallError
+from google.cloud.scheduler_v1.types import job as gcs_job
 from flask import Response
 
 from api.utils import message_resp
 
 
-def create_scheduler_job() -> Response:
+def create_scheduler_job(user_id: str) -> gcs_job.Job:
     """Create a job with an App Engine target via the Cloud Scheduler API"""
     client = scheduler.CloudSchedulerClient()
     tz = os.environ.get("TZ")
     project_id = os.environ.get("GCP_PROJECT_ID")
     location_id = os.environ.get("GCP_LOCATION")
-    url = os.environ.get("DEV_SCIENCE_URL")
+    base_url = os.environ.get("DEV_SCIENCE_URL")
+    url = f"{base_url}/daily-report?user_id={user_id}"
     parent = f"projects/{project_id}/locations/{location_id}"
 
     duration = Duration()
@@ -30,9 +32,7 @@ def create_scheduler_job() -> Response:
 
     # Use the client to send the job creation request.
     response = client.create_job(request={"parent": parent, "job": job})
-
-    print("Created job: {}".format(response.name))
-    return message_resp()
+    return response
 
 
 def delete_scheduler_job(job_id: str) -> Response:
