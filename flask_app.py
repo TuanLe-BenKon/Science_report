@@ -76,13 +76,12 @@ def dailyReport():
         "10940",
         "12",
         "590",
-        "4619",
         "176",
         "26",
         "11301",
         "11291",
-        "11303",
     ]
+
     for user_id in ids:
         if user_id in ["10019", "11294", "11296", "10940", "11301"]:
             mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]

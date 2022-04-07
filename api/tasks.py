@@ -16,6 +16,27 @@ THRESHOLD_BY_POWER = {"1.0": 300, "1.5": 500, "2.0": 2000, "2.5": 4000}
 IN_SECONDS = 7200  # 2 hours in seconds
 
 
+def get_energy_data_accessory(device_id: UUID, init_timestamp: int, duration: int) -> pd.DataFrame:
+    DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
+    engine = create_engine(DATABASE_URL)
+
+    bounded_timestamp = init_timestamp + 60 * 60 * duration
+    sql_statement = f"""
+            SELECT e.power, e.energy, e.timestamp
+            FROM public.accessories as a 
+                JOIN public.energy_data as e ON a.id = e.accessory_id
+            WHERE 
+                a.device_id = '{device_id}'
+                AND {init_timestamp} <= e.timestamp 
+                AND e.timestamp <= {bounded_timestamp}
+        """
+    try:
+        df = pd.read_sql(sql_statement, con=engine)
+    except:
+        df = pd.DataFrame()
+    return df
+
+
 def get_energy_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> pd.DataFrame:
     DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
     engine = create_engine(DATABASE_URL)

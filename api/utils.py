@@ -137,13 +137,18 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
         if not os.path.exists(chart_url):
             chart_url = ""
 
+        if df_sensor.empty and df_energy.empty:
+            energy_consumption = np.nan
+        else:
+            energy_consumption = np.round(get_energy_consumption(df_energy) / 1000, 3)
+
         # Gen report's page for each device
         data_report = BenKonReportData(
             user=username[user_id],
             device=device_name[device_id],
             report_date=pd.to_datetime(track_day),
             chart_url=chart_url,
-            energy_kwh=np.round(get_energy_consumption(df_energy) / 1000, 3),
+            energy_kwh=energy_consumption,
             activities=activities,
         )
         data.append(data_report)
