@@ -1,6 +1,7 @@
 from datetime import datetime as dt
 import pandas as pd
 import numpy as np
+from scipy.stats import zscore
 
 MISSING_THRESHOLD = 11*60 # seconds
 
@@ -78,23 +79,23 @@ def process_outliers(df):
 ## Reset Energy
 def process_reset(df):
     if len(df) != 0:
-        Q1 = df['energy'].quantile(0.2)
-        Q3 = df['energy'].quantile(0.8)
+        z_score = zscore(df['energy'])
+        z_score = np.abs(z_score)
+        outliers = np.where(z_score > 3)[0]
 
-        IQR = Q3 - Q1
+        for i in outliers:
 
-        outliers_filter = ((df['energy'] < (Q1 - 1.5 * IQR)) | (df['energy'] > (Q3 + 1.5 * IQR)))
-
-        outliers = df.loc[outliers_filter].index
-
-        for i in range(len(outliers)):
-
-            if outliers[i] == 0:
-                df.at[outliers[i], 'energy'] = df['energy'].iloc[outliers[i] + 1] 
-                df.at[outliers[i], 'power'] = df['power'].iloc[outliers[i] + 1]
+            if i == 0:
+                df.at[i, 'energy'] = df['energy'].iloc[i + 1]
+                df.at[i, 'power'] = df['power'].iloc[i + 1]
             else:
-                df.at[outliers[i], 'energy'] = df['energy'].iloc[outliers[i] - 1] 
-                df.at[outliers[i], 'power'] = df['power'].iloc[outliers[i] - 1]
+                df.at[i, 'energy'] = df['energy'].iloc[i - 1]
+                df.at[i, 'power'] = df['power'].iloc[i - 1]
+
+        if len(outliers) > 0:
+            df = process_reset(df)
+        else:
+            return df
 
     return df
 
@@ -162,7 +163,10 @@ def process_missing_data(df, data_type):
 
 ## Get Energy Consumption
 def get_energy_consumption(df):
-    return df['energy'].iloc[-1] - df['energy'].iloc[0]
+    if df.empty:
+        return np.nan
+    else:
+        return df['energy'].iloc[-1] - df['energy'].iloc[0]
 
 
 ## Get Working Time

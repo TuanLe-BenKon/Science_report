@@ -122,12 +122,18 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
                 else:
                     fan_speed = str(int(df_activities["fan_speed"].iloc[i]))
 
+                # Temperature
+                if power[df_activities["power"].iloc[i]] in ['OFF', 'Không có']:
+                    configured_temp = '-- °C'
+                else:
+                    configured_temp = str(int(df_activities["temperature"].iloc[i])) + "°C"
+
                 row_act = ACActivity(
                     type=df_activities["event_type"].iloc[i],
                     power_status=power[df_activities["power"].iloc[i]],
                     op_mode=df_activities["operation_mode"].iloc[i],
                     op_time=act_time,
-                    configured_temp=str(int(df_activities["temperature"].iloc[i])) + "°C",
+                    configured_temp=configured_temp,
                     fan_speed=fan_speed,
                 )
             activities.append(row_act)
@@ -137,23 +143,18 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
         if not os.path.exists(chart_url):
             chart_url = ""
 
-        if df_sensor.empty and df_energy.empty:
-            energy_consumption = np.nan
-        else:
-            energy_consumption = np.round(get_energy_consumption(df_energy) / 1000, 3)
-
         # Gen report's page for each device
         data_report = BenKonReportData(
             user=username[user_id],
             device=device_name[device_id],
             report_date=pd.to_datetime(track_day),
             chart_url=chart_url,
-            energy_kwh=energy_consumption,
+            energy_kwh=np.round(get_energy_consumption(df_energy) / 1000, 3),
             activities=activities,
         )
         data.append(data_report)
 
-    if user_id in ["10019", "11294", "11296", "11291", "11290", "10940"]:
+    if user_id in ["10019", "11294", "11296", "11291", "11290", "10940", "11320"]:
         isGenSummaryPage = False
     else:
         isGenSummaryPage = True
