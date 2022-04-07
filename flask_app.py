@@ -1,6 +1,4 @@
 import os
-from sched import scheduler
-import time
 
 import pandas as pd
 import datetime
@@ -41,13 +39,13 @@ def health():
 @app.route("/science/v1/daily-report", methods=["GET"])
 def dailyReport():
 
-    # request_data = request.args
-    # schema = GenReportSchema()
-    # try:
-    #     data = schema.load(request_data)
-    #     user_id = data['user_id']
-    # except ValidationError as err:
-    #     return message_resp(err.messages, 400)
+    request_data = request.args
+    schema = GenReportSchema()
+    try:
+        data = schema.load(request_data)
+        user_id = data['user_id']
+    except ValidationError as err:
+        return message_resp(err.messages, 400)
 
     records = get_device_info()
     df_info = pd.DataFrame(
@@ -69,31 +67,42 @@ def dailyReport():
     print(date)
     track_day = "{}-{:02d}-{:02d}".format(date.year, date.month, date.day)
 
-    ids = ["10019"]
-    for user_id in ids:
-        if user_id in ["10019", "11294", "11296", "10940", "11301"]:
-            mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
-            bcc_list = []
-        elif user_id in ["11291"]:
-            mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
-            bcc_list = []
-        else:
-            records = get_customer_emails()
-            df_mail = pd.DataFrame(
-                records, columns=["no", "user_id", "user_name", "external", "internal"],
-            )
+    # ids = [
+    #     "10019",
+    #     "11294",
+    #     "11296",
+    #     "10940",
+    #     "12",
+    #     "590",
+    #     "176",
+    #     "26",
+    #     "11301",
+    #     "11291",
+    # ]
 
-            s = df_mail[df_mail["user_id"] == user_id].iloc[0]["external"]
-            mail_list = s[1 : len(s) - 1].split(";")
+    if user_id in ["10019", "11294", "11296", "10940", "11301"]:
+        mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
+        bcc_list = []
+    elif user_id in ["11291"]:
+        mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
+        bcc_list = []
+    else:
+        records = get_customer_emails()
+        df_mail = pd.DataFrame(
+            records, columns=["no", "user_id", "user_name", "external", "internal"],
+        )
 
-            s = df_mail[df_mail["user_id"] == user_id].iloc[0]["internal"]
-            bcc_list = s[1 : len(s) - 1].split(";")
+        s = df_mail[df_mail["user_id"] == user_id].iloc[0]["external"]
+        mail_list = s[1 : len(s) - 1].split(";")
 
-        print(mail_list)
-        print(bcc_list)
+        s = df_mail[df_mail["user_id"] == user_id].iloc[0]["internal"]
+        bcc_list = s[1 : len(s) - 1].split(";")
 
-        gen_report(df_info, user_id, track_day)
-        send_mail(df_info, user_id, track_day, mail_list, bcc_list)
+    print(mail_list)
+    print(bcc_list)
+
+    gen_report(df_info, user_id, track_day)
+    send_mail(df_info, user_id, track_day, mail_list, bcc_list)
 
     return message_resp()
 
