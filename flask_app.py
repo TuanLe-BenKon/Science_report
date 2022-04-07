@@ -82,7 +82,7 @@ def dailyReport():
         "11320"
     ]
 
-    if user_id in ["10019", "11294", "11296", "10940", "11301", "11302"]:
+    if user_id in ["10019", "11294", "11296", "10940"]:
         mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
         bcc_list = [
             'tuan.le@lab2lives.com',
@@ -92,12 +92,6 @@ def dailyReport():
             'dung.bui@lab2lives.com',
             'ann.tran@lab2lives.com'
         ]
-    elif user_id in ["11291", "11290"]:
-        mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
-        bcc_list = [
-            'tuan.le@lab2lives.com',
-            'liam.thai@lab2lives.com',
-        ]
     else:
         records = get_customer_emails()
         df_mail = pd.DataFrame(
@@ -106,6 +100,11 @@ def dailyReport():
 
         s = df_mail[df_mail["user_id"] == user_id].iloc[0]["external"]
         mail_list = s[1:len(s) - 1].split(";")
+        if mail_list == ['']:
+            mail_list = [
+                "nhat.thai@lab2lives.com",
+                "thomas.luu@lab2lives.com"
+            ]
 
         s = df_mail[df_mail["user_id"] == user_id].iloc[0]["internal"]
         bcc_list = s[1:len(s) - 1].split(";")

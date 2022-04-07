@@ -92,13 +92,15 @@ def export_chart(bg_dir, device_name, device_id, df_sensor, df_energy, df_activi
 
         if df_activities['power'].iloc[i]:
             power = 'ON'
+            temp = str(int(df_activities['temperature'].iloc[i]))
         else:
             power = 'OFF'
+            temp = '--'
 
         if not flag_sch:
             act_info = '''{}\n{}\n{}\n{}°C\nfan_{}
                 '''.format(power, control, df_activities['operation_mode'].iloc[i],
-                           str(df_activities['temperature'].iloc[i]),
+                           temp,
                            int(df_activities['fan_speed'].iloc[i]))
         else:
             act_info = control
