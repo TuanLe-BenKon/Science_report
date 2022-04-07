@@ -67,23 +67,25 @@ def dailyReport():
     print(date)
     track_day = "{}-{:02d}-{:02d}".format(date.year, date.month, date.day)
 
-    # ids = [
-    #     "10019",
-    #     "11294",
-    #     "11296",
-    #     "10940",
-    #     "12",
-    #     "590",
-    #     "176",
-    #     "26",
-    #     "11301",
-    #     "11291",
-    # ]
+    ids = [
+        "10019",
+        "11294",
+        "11296",
+        "10940",
+        "12",
+        "590",
+        "176",
+        "26",
+        "11291",
+        "11290",
+        "11301",
+        "11320"
+    ]
 
-    if user_id in ["10019", "11294", "11296", "10940", "11301"]:
+    if user_id in ["10019", "11294", "11296", "10940", "11301", "11302"]:
         mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
         bcc_list = []
-    elif user_id in ["11291"]:
+    elif user_id in ["11291", "11290"]:
         mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
         bcc_list = []
     else:
@@ -93,10 +95,10 @@ def dailyReport():
         )
 
         s = df_mail[df_mail["user_id"] == user_id].iloc[0]["external"]
-        mail_list = s[1 : len(s) - 1].split(";")
+        mail_list = s[1:len(s) - 1].split(";")
 
         s = df_mail[df_mail["user_id"] == user_id].iloc[0]["internal"]
-        bcc_list = s[1 : len(s) - 1].split(";")
+        bcc_list = s[1:len(s) - 1].split(";")
 
     print(mail_list)
     print(bcc_list)
