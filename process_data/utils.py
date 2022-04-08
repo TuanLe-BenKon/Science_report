@@ -92,10 +92,10 @@ def process_reset(df):
                 df.at[i, 'energy'] = df['energy'].iloc[i - 1]
                 df.at[i, 'power'] = df['power'].iloc[i - 1]
 
-        if len(outliers) > 0:
-            df = process_reset(df)
-        else:
-            return df
+        # if len(outliers) > 0:
+        #     df = process_reset(df)
+        # else:
+        #     return df
 
     return df
 
