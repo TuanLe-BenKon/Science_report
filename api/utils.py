@@ -79,8 +79,9 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
             pass
         else:
             if int(df_info[df_info['device_id'] == device_id]['outdoor_unit']) == 1:
-                energy_list.append(get_energy_consumption(df_energy)/1000)
-                device_list.append(device_id)
+                if not np.isnan(get_energy_consumption(df_energy)):
+                    energy_list.append(get_energy_consumption(df_energy)/1000)
+                    device_list.append(device_id)
 
             export_chart(
                 local_chart_dir,
