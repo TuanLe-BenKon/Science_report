@@ -18,6 +18,7 @@ from api.device_info.controllers import *
 from api.customer_emails.routes import customer_bp
 from api.customer_emails.controllers import *
 from api.scheduler_jobs.routes import scheduler_bp
+from process_data.extract_user_data import *
 
 
 app = Flask(__name__)
@@ -67,30 +68,30 @@ def dailyReport():
     print(date)
     track_day = "{}-{:02d}-{:02d}".format(date.year, date.month, date.day)
 
-    ids = [
-        "10019",
-        "11294",
-        "11296",
-        "10940",
-        "12",
-        "590",
-        "176",
-        "26",
-        "11291",
-        "11290",
-        "11301",
-        "11320"
-    ]
+    # ids = [
+    #     "10019",
+    #     "11294",
+    #     "11296",
+    #     "10940",
+    #     "12",
+    #     "590",
+    #     "176",
+    #     "26",
+    #     "11291",
+    #     "11290",
+    #     "11301",
+    #     "11320"
+    # ]
 
     if user_id in ["10019", "11294", "11296", "10940"]:
         mail_list = ["nhat.thai@lab2lives.com", "thomas.luu@lab2lives.com"]
         bcc_list = [
-            # 'tuan.le@lab2lives.com',
-            # 'hieu.tran@lab2lives.com',
-            # 'taddy@lab2lives.com',
-            # 'liam.thai@lab2lives.com',
-            # 'dung.bui@lab2lives.com',
-            # 'ann.tran@lab2lives.com'
+            'tuan.le@lab2lives.com',
+            'hieu.tran@lab2lives.com',
+            'taddy@lab2lives.com',
+            'liam.thai@lab2lives.com',
+            'dung.bui@lab2lives.com',
+            'ann.tran@lab2lives.com'
         ]
     else:
         records = get_customer_emails()
@@ -158,3 +159,4 @@ if __name__ == "__main__":
     create_email_table()
     server_port = os.environ.get("PORT", "8080")
     app.run(debug=False, port=server_port, host="0.0.0.0")
+

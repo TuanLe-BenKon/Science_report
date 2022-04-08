@@ -150,9 +150,9 @@ def export_summary_chart(
     label = []
 
     for device_id in device_list:
-        df_energy_1 = extract_energy_data(user_id, device_id, track_day)
-        df_energy_2 = extract_energy_data(user_id, device_id, track_day_2)
-        df_energy_3 = extract_energy_data(user_id, device_id, track_day_3)
+        df_energy_1 = extract_energy_data(device_id, track_day)
+        df_energy_2 = extract_energy_data(device_id, track_day_2)
+        df_energy_3 = extract_energy_data(device_id, track_day_3)
 
         ec1 = get_energy_consumption(df_energy_1) / 1000
         ec2 = get_energy_consumption(df_energy_2) / 1000

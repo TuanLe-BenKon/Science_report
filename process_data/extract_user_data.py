@@ -47,10 +47,10 @@ def extract_user_data(user_id, device_id: str, track_day: str):
         Process data frame energy
     '''
     t_energy = time.time()
-    if user_id == '11320':
+    if not get_accessories_df(device_id).empty:
         df_energy = get_energy_data_accessory(device_id, convert_to_unix_timestamp(track_day), 24)
     else:
-        df_energy = get_energy_data(device_id, user_id, convert_to_unix_timestamp(track_day), 24)
+        df_energy = get_energy_data(device_id, convert_to_unix_timestamp(track_day), 24)
     t_energy = time.time() - t_energy
 
     ## Change UTC Time to Timestamp and Sort dataframe
@@ -117,8 +117,8 @@ def extract_user_data(user_id, device_id: str, track_day: str):
 
 
 # Get preprocess energy data
-def extract_energy_data(user_id, device_id: str, track_day: str):
-    df_energy = get_energy_data(device_id, user_id, convert_to_unix_timestamp(track_day), 24)
+def extract_energy_data(device_id: str, track_day: str):
+    df_energy = get_energy_data(device_id, convert_to_unix_timestamp(track_day), 24)
 
     ## Change UTC Time to Timestamp and Sort dataframe
     df_energy = df_energy[['timestamp', 'power', 'energy']]

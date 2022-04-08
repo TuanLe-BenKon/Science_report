@@ -77,14 +77,19 @@ def process_outliers(df):
 
 
 ## Reset Energy
-def process_reset(df):
-    if len(df) != 0:
+def process_reset(df: pd.DataFrame) -> pd.DataFrame:
+
+    if df.empty:
+        return df
+
+    cnt_loop = 0
+    while True:
+
         z_score = zscore(df['energy'])
         z_score = np.abs(z_score)
         outliers = np.where(z_score > 3)[0]
 
         for i in outliers:
-
             if i == 0:
                 df.at[i, 'energy'] = df['energy'].iloc[i + 1]
                 df.at[i, 'power'] = df['power'].iloc[i + 1]
@@ -92,10 +97,10 @@ def process_reset(df):
                 df.at[i, 'energy'] = df['energy'].iloc[i - 1]
                 df.at[i, 'power'] = df['power'].iloc[i - 1]
 
-        # if len(outliers) > 0:
-        #     df = process_reset(df)
-        # else:
-        #     return df
+        if len(outliers) == 0 or cnt_loop >= 5:
+            break
+
+        cnt_loop += 1
 
     return df
 
