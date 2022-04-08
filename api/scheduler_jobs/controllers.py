@@ -1,4 +1,5 @@
 import os
+import random
 
 from google.cloud import scheduler
 from google.protobuf.duration_pb2 import Duration
@@ -9,7 +10,7 @@ from flask import Response
 from api.utils import message_resp
 
 
-def create_scheduler_job(user_id: str) -> gcs_job.Job:
+def create_scheduler_job(user_id: str, schedule: str = None) -> gcs_job.Job:
     """Create a job with an App Engine target via the Cloud Scheduler API"""
     client = scheduler.CloudSchedulerClient()
     tz = os.environ.get("TZ")
@@ -21,10 +22,12 @@ def create_scheduler_job(user_id: str) -> gcs_job.Job:
 
     duration = Duration()
     duration.seconds = 1800
+    r1 = random.randint(0, 30)
+    schedule = schedule if schedule else f"{r1} 7 * * *"
     # Construct the request body.
     job = {
         "http_target": {"uri": url, "http_method": 2,},
-        "schedule": "0 7 * * *",
+        "schedule": schedule,
         "time_zone": tz,
         "retry_config": {"retry_count": 1},
         "attempt_deadline": duration,
