@@ -72,8 +72,9 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
         )
 
         if (
-                df_sensor.empty and
-                df_energy.empty
+            (df_sensor.empty and df_energy.empty) or
+            np.isnan(df_energy['energy'].min())
+
         ):
             pass
         else:
@@ -154,7 +155,7 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
         )
         data.append(data_report)
 
-    if user_id in ["10019", "11294", "11296", "11291", "11290", "10940", "11320", "11301"]:
+    if user_id in ["10019", "11294", "11296", "11291", "11290", "10940", "11320", "11301", "1856"]:
         isGenSummaryPage = False
     else:
         isGenSummaryPage = True
