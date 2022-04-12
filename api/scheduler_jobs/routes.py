@@ -1,7 +1,7 @@
 from urllib import request
 from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
-from api.scheduler_jobs.controllers import create_scheduler_job
+from api.scheduler_jobs.tasks import create_scheduler_job
 from api.scheduler_jobs.validation import SchedulerlSchema
 
 from api.utils import message_resp

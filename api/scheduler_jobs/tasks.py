@@ -24,12 +24,13 @@ def create_scheduler_job(user_id: str, schedule: str = None) -> gcs_job.Job:
     duration.seconds = 1800
     r1 = random.randint(0, 30)
     schedule = schedule if schedule else f"{r1} 7 * * *"
+
     # Construct the request body.
     job = {
         "http_target": {"uri": url, "http_method": 2,},
         "schedule": schedule,
         "time_zone": tz,
-        "retry_config": {"retry_count": 1},
+        "retry_config": {"retry_count": 1, "min_backoff_duration": duration},
         "attempt_deadline": duration,
     }
 
