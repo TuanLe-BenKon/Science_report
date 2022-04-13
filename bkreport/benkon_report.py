@@ -179,13 +179,15 @@ class BenKonReport:
         self.elements.append(chartTitle)
 
         # Pie chart image
+        self.elements.append(Spacer(10, 0.25 * cm))
         if self.url_summary_chart == '':
             pass
         else:
             imgChart = Image(self.url_summary_chart)
-            chartSize = self.conf.pageWidth
-            imgChart.drawHeight = chartSize * 1.1
-            imgChart.drawWidth = chartSize
+            chartWidth = self.conf.pageWidth
+            chartHeight = self.conf.pageHeight
+            imgChart.drawHeight = chartHeight * 0.75
+            imgChart.drawWidth = chartWidth
             imgChart.hAlign = 'CENTER'
             self.elements.append(imgChart)
 

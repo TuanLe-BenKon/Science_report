@@ -155,22 +155,18 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
         )
         data.append(data_report)
 
-    if user_id in ["10019", "11294", "11296", "11291", "11290", "10940", "11320", "11301", "1856"]:
-        isGenSummaryPage = False
+    isGenSummaryPage = True
+    if len(device_list) == 0 or len(energy_list) == 0:
+        pass
     else:
-        isGenSummaryPage = True
-
-        if len(device_list) == 0 or len(energy_list) == 0:
-            pass
-        else:
-            export_summary_chart(
-                local_chart_dir,
-                user_id,
-                device_list,
-                energy_list,
-                device_name,
-                track_day
-            )
+        export_summary_chart(
+            local_chart_dir,
+            user_id,
+            device_list,
+            energy_list,
+            device_name,
+            track_day
+        )
 
     summary_chart_url = local_chart_dir + '/SummaryChart_' + track_day + '.png'
     if not os.path.exists(summary_chart_url):

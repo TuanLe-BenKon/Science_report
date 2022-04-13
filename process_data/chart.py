@@ -216,7 +216,7 @@ def export_summary_chart(
     # Wedge properties
     wp = {'linewidth': 2, 'edgecolor': "black", 'alpha': 0.75}
 
-    fig, axs = plt.subplots(3, 1, sharex=True, figsize=(15, 18))
+    fig, axs = plt.subplots(3, 1, sharex=True, figsize=(15, 16))
     fig.subplots_adjust(hspace=0.05)
 
     wedges, texts, autotexts = axs[0].pie(
@@ -225,7 +225,6 @@ def export_summary_chart(
         startangle=90,
         wedgeprops=wp,
         textprops={'fontsize': 14},
-        center=(0.2, 0.5)
     )
 
     label_list = []
@@ -240,13 +239,13 @@ def export_summary_chart(
         label_list,
         title="Device List",
         loc="upper right",
-        bbox_to_anchor=(1, 0.75),
+        bbox_to_anchor=(1.15 - len(label_list) * 0.01, 0.75),
         fontsize=14
     )
 
     plt.setp(autotexts, size=12, weight="bold")
     axs[0].set_title(
-        'Total Energy Consumption ({}): {:.2f} kWh'.format(track_day, np.sum(energy_list)), fontsize=16)
+        'Total Energy Consumption ({}): {:.2f} kWh'.format(track_day, np.sum(energy_list)), fontsize=18)
 
     g = sns.barplot(
         ax=axs[1],
