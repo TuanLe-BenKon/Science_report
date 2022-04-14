@@ -126,13 +126,15 @@ class BenKonReportData:
 
 
 class BenKonReport:
-    def __init__(self,
-                 path: str,
-                 isGenSummaryPage: bool,
-                 url_summary_chart: str,
-                 data: "list[BenKonReportData]",
-                 config: ReportConfig = ReportConfig()
-                 ):
+    def __init__(
+            self,
+            path: str,
+            isGenSummaryPage: bool,
+            url_pie_chart: str,
+            url_bar_chart: str,
+            data: "list[BenKonReportData]",
+            config: ReportConfig = ReportConfig()
+    ):
         # Create path if not exists
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -142,7 +144,8 @@ class BenKonReport:
         self.conf.registerFont()
         self.path = path
         self.data = data
-        self.url_summary_chart = url_summary_chart
+        self.url_pie_chart = url_pie_chart
+        self.url_bar_chart = url_bar_chart
         self.styleSheet = getSampleStyleSheet()
         self.elements = []
 
@@ -180,13 +183,25 @@ class BenKonReport:
 
         # Pie chart image
         self.elements.append(Spacer(10, 0.25 * cm))
-        if self.url_summary_chart == '':
+        if self.url_pie_chart == '':
             pass
         else:
-            imgChart = Image(self.url_summary_chart)
+            imgChart = Image(self.url_pie_chart)
             chartWidth = self.conf.pageWidth
             chartHeight = self.conf.pageHeight
-            imgChart.drawHeight = chartHeight * 0.75
+            imgChart.drawHeight = chartHeight * 0.25
+            imgChart.drawWidth = chartWidth * 0.6
+            imgChart.hAlign = 'CENTER'
+            self.elements.append(imgChart)
+
+        # Bar chart image
+        if self.url_bar_chart == '':
+            pass
+        else:
+            imgChart = Image(self.url_bar_chart)
+            chartWidth = self.conf.pageWidth
+            chartHeight = self.conf.pageHeight
+            imgChart.drawHeight = chartHeight * 0.55
             imgChart.drawWidth = chartWidth
             imgChart.hAlign = 'CENTER'
             self.elements.append(imgChart)

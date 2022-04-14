@@ -171,7 +171,7 @@ def get_energy_consumption(df):
     if df.empty:
         return np.nan
     else:
-        return df['energy'].iloc[-1] - df['energy'].iloc[0]
+        return df['energy'].max() - df['energy'].min()
 
 
 ## Get Working Time

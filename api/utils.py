@@ -74,12 +74,11 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
         if (
             (df_sensor.empty and df_energy.empty) or
             np.isnan(df_energy['energy'].min())
-
         ):
             pass
         else:
             if int(df_info[df_info['device_id'] == device_id]['outdoor_unit']) == 1:
-                if not np.isnan(get_energy_consumption(df_energy)):
+                if (not np.isnan(get_energy_consumption(df_energy))) and (get_energy_consumption(df_energy) > 1000):
                     energy_list.append(get_energy_consumption(df_energy)/1000)
                     device_list.append(device_id)
 
@@ -155,31 +154,54 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
         )
         data.append(data_report)
 
-    isGenSummaryPage = True
-    if len(device_list) == 0 or len(energy_list) == 0:
+    total_energy_consumption = float(np.sum(energy_list))
+    if len(device_list) <= 8:
         pass
     else:
-        export_summary_chart(
+        df = pd.DataFrame(data=zip(device_list, energy_list), columns=['device_id', 'energy_consumption'])
+        df = df.sort_values(by='energy_consumption', ascending=False).reset_index(drop=True)
+        device_list = df.iloc[:8]['device_id'].to_list()
+        energy_list = df.iloc[:8]['energy_consumption'].to_list()
+
+    # Summary page information
+    if len(energy_list) == 0 or len(device_list) == 0:
+        # Không có device nào có năng lượng
+        isGenSummaryPage = False
+        pass
+    else:
+        isGenSummaryPage = True
+        export_energy_pie_chart(
             local_chart_dir,
-            user_id,
             device_list,
             energy_list,
+            total_energy_consumption,
             device_name,
             track_day
         )
 
-    summary_chart_url = local_chart_dir + '/SummaryChart_' + track_day + '.png'
-    if not os.path.exists(summary_chart_url):
-        summary_chart_url = ''
+        export_last_3_days_working_time(
+            local_chart_dir,
+            device_list,
+            device_name,
+            track_day
+        )
 
-    # isGenSummaryPage = False
-    # summary_chart_url = ''
+    # Check if pie chart is exists
+    url_pie_chart = f'{local_chart_dir}/EnergyPieChart.png'
+    if not os.path.exists(url_pie_chart):
+        url_pie_chart = ''
+
+    # Check if bar chart is exists
+    url_bar_chart = f'{local_chart_dir}/Last3DaysChart.png'
+    if not os.path.exists(url_bar_chart):
+        url_bar_chart = ''
 
     os.makedirs(f"{local_report_dir}", exist_ok=True)
     BenKonReport(
         f"{local_report_dir}/BenKon_Daily_Report.pdf",
         isGenSummaryPage=isGenSummaryPage,
-        url_summary_chart=summary_chart_url,
+        url_pie_chart=url_pie_chart,
+        url_bar_chart=url_bar_chart,
         data=data
     )
 
@@ -220,7 +242,7 @@ def send_mail(
     attach.add_header(
         "Content-Disposition",
         "attachment",
-        filename=f"BenKon Daily Report - {username[user_id]}",
+        filename=f"BenKon Daily Report - {username[user_id]}.pdf",
     )
     message.attach(attach)
 

@@ -130,6 +130,190 @@ def func(pct):
     return "{:.1f}%".format(pct)
 
 
+def export_energy_pie_chart(
+        bg_dir: str,
+        device_list: List[str],
+        energy_list: List[float],
+        total_energy_consumption: float,
+        device_name,
+        track_day: str
+):
+    # Assign label with device name
+    label = []
+    for device_id in device_list:
+        label.append(device_name[device_id])
+
+    # Wedge properties
+    wp = {'linewidth': 2, 'edgecolor': "black", 'alpha': 0.75}
+
+    fig, ax = plt.subplots(figsize=(8, 5), facecolor='w')
+    wedges, texts, autotexts = ax.pie(
+        energy_list,
+        autopct=lambda pct: func(pct),
+        startangle=90,
+        wedgeprops=wp,
+        textprops={'fontsize': 12},
+    )
+
+    label_list = []
+    idx = 0
+    for lab in label:
+        label_list.append(lab + ' (' + str(np.round(energy_list[idx])) + 'kWh)')
+        idx += 1
+
+    # Adding legend
+    ax.legend(
+        wedges,
+        label_list,
+        title="Device List",
+        loc="center right",
+        bbox_to_anchor=(1, 0.5),
+        fontsize=12,
+        bbox_transform=plt.gcf().transFigure
+    )
+
+    plt.setp(autotexts, size=12, weight="bold")
+
+    title = ax.set_title(
+        'Total Energy Consumption ({}): {:.2f} kWh'.format(track_day, total_energy_consumption), fontsize=15)
+    title.set_ha('left')
+
+    plt.subplots_adjust(left=0.0, bottom=0.1, right=0.45)
+    plt.savefig(f'{bg_dir}/EnergyPieChart.png')
+    plt.close()
+
+
+def export_last_3_days_working_time(
+        bg_dir: str,
+        device_list: List[str],
+        device_name,
+        track_day: str
+):
+    date1 = pd.to_datetime(track_day)
+    date2 = date1 - datetime.timedelta(days=1)
+    date3 = date1 - datetime.timedelta(days=2)
+
+    track_day_2 = '{}-{:02d}-{:02d}'.format(date2.year, date2.month, date2.day)
+    track_day_3 = '{}-{:02d}-{:02d}'.format(date3.year, date3.month, date3.day)
+
+    e = [[], [], []]
+    t = [[], [], []]
+    label = []
+
+    for device_id in device_list:
+        df_energy_1 = extract_energy_data(device_id, track_day)
+        df_energy_2 = extract_energy_data(device_id, track_day_2)
+        df_energy_3 = extract_energy_data(device_id, track_day_3)
+
+        ec1 = get_energy_consumption(df_energy_1) / 1000
+        ec2 = get_energy_consumption(df_energy_2) / 1000
+        ec3 = get_energy_consumption(df_energy_3) / 1000
+
+        wt1 = get_working_time(df_energy_1) / 3600
+        wt2 = get_working_time(df_energy_2) / 3600
+        wt3 = get_working_time(df_energy_3) / 3600
+
+        if not np.isnan(ec1):
+            e[0].append(ec1)
+        else:
+            e[0].append(0)
+
+        if not np.isnan(ec2):
+            e[1].append(ec2)
+        else:
+            e[1].append(0)
+
+        if not np.isnan(ec3):
+            e[2].append(ec3)
+        else:
+            e[2].append(0)
+
+        if not np.isnan(wt1):
+            t[0].append(wt1)
+        else:
+            t[0].append(0)
+
+        if not np.isnan(wt2):
+            t[1].append(wt2)
+        else:
+            t[1].append(0)
+
+        if not np.isnan(wt3):
+            t[2].append(wt3)
+        else:
+            t[2].append(0)
+
+        label.append(device_name[device_id])
+
+    df_energy_consumption = pd.DataFrame({
+        'Device Name': label,
+        'Last 2 days': e[2],
+        'Yesterday': e[1],
+        'Today': e[0]
+    })
+
+    df_working_time = pd.DataFrame({
+        'Device Name': label,
+        'Last 2 days': t[2],
+        'Yesterday': t[1],
+        'Today': t[0]
+    })
+
+    df_energy_consumption = pd.melt(df_energy_consumption, id_vars="Device Name", var_name="Track Day",
+                                    value_name='Energy Consumption (kWh)')
+    df_working_time = pd.melt(df_working_time, id_vars="Device Name", var_name="Track Day",
+                              value_name='Working Time (Hours)')
+
+    fig, axs = plt.subplots(2, 1, sharex=True, figsize=(12, 10))
+    fig.subplots_adjust(hspace=0.05)
+
+    g = sns.barplot(
+        ax=axs[0],
+        x='Device Name',
+        y='Energy Consumption (kWh)',
+        hue='Track Day',
+        data=df_energy_consumption,
+        color='green'
+    )
+    for al, bar in zip(alpha, axs[0].containers[0]):
+        bar.set_alpha(alpha=al)
+    axs[0].get_legend().remove()
+
+    g.set(xlabel=None)
+    ax = axs[0]
+    for p in ax.patches:
+        axs[0].text(p.get_x() + p.get_width() / 2., p.get_height(), '%.2f' % p.get_height(), fontsize=10, color='red',
+                    ha='center', va='bottom')
+
+    axs[1].set_ylim(0, 25)
+    sns.barplot(
+        ax=axs[1],
+        x='Device Name',
+        y='Working Time (Hours)',
+        hue='Track Day',
+        data=df_working_time,
+        color='green'
+    )
+    for al, bar in zip(alpha, axs[1].containers[0]):
+        bar.set_alpha(alpha=al)
+
+    ax = axs[1]
+    for p in ax.patches:
+        working_hour = p.get_height()
+        hour = int(working_hour)
+        minute = int((p.get_height() - hour) * 60)
+        time_display = '{:02d}:{:02d}'.format(hour, minute)
+
+        axs[1].text(p.get_x() + p.get_width() / 2., p.get_height(), time_display, fontsize=10, color='red',
+                    ha='center', va='bottom')
+
+    plt.xticks(rotation=30)
+    plt.legend(fontsize=10)
+
+    plt.savefig(f'{bg_dir}/Last3DaysChart.png')
+    plt.close()
+
+
 def export_summary_chart(
         bg_dir: str,
         user_id: str,
@@ -196,16 +380,16 @@ def export_summary_chart(
 
     df_energy_consumption = pd.DataFrame({
         'Device Name': label,
-        '2 ngày trước': e[2],
-        'Hôm qua': e[1],
-        'Hôm nay': e[0]
+        'Last 2 days': e[2],
+        'Yesterday': e[1],
+        'Today': e[0]
     })
 
     df_working_time = pd.DataFrame({
         'Device Name': label,
-        '2 ngày trước': t[2],
-        'Hôm qua': t[1],
-        'Hôm nay': t[0]
+        'Last 2 days': t[2],
+        'Yesterday': t[1],
+        'Today': t[0]
     })
 
     df_energy_consumption = pd.melt(df_energy_consumption, id_vars="Device Name", var_name="Track Day",
