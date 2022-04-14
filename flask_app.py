@@ -158,4 +158,6 @@ if __name__ == "__main__":
     load_dotenv(find_dotenv())
     create_device_table()
     create_email_table()
+    server_port = os.environ.get("PORT", "8080")
+    app.run(debug=False, port=server_port, host="0.0.0.0")
 
