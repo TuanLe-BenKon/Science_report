@@ -91,7 +91,8 @@ def dailyReport():
             'taddy@lab2lives.com',
             'liam.thai@lab2lives.com',
             'dung.bui@lab2lives.com',
-            'ann.tran@lab2lives.com'
+            'ann.tran@lab2lives.com',
+            'kevin.bui@lab2lives.com'
         ]
     else:
         records = get_customer_emails()
@@ -157,6 +158,4 @@ if __name__ == "__main__":
     load_dotenv(find_dotenv())
     create_device_table()
     create_email_table()
-    server_port = os.environ.get("PORT", "8080")
-    app.run(debug=False, port=server_port, host="0.0.0.0")
 
