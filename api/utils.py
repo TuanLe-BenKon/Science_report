@@ -186,6 +186,8 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
             track_day
         )
 
+    # isGenSummaryPage = False
+
     # Check if pie chart is exists
     url_pie_chart = f'{local_chart_dir}/EnergyPieChart.png'
     if not os.path.exists(url_pie_chart):

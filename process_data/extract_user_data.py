@@ -17,8 +17,6 @@ def convert_to_unix_timestamp(_time: str) -> int:
 
 def extract_user_data(user_id, device_id: str, track_day: str):
 
-    date = pd.to_datetime(track_day)
-
     ###############################################################################################################
     '''
         Process data frame sensor
@@ -75,7 +73,7 @@ def extract_user_data(user_id, device_id: str, track_day: str):
     cols = ['event_type', 'timestamp', 'power', 'temperature', 'fan_speed', 'operation_mode']
 
     t_act = time.time()
-    df_activities = get_activities_data(device_id, user_id, convert_to_unix_timestamp(track_day), 24)
+    df_activities = get_activities_data(device_id, convert_to_unix_timestamp(track_day), 24)
     t_act = time.time() - t_act
 
     print('Total query time of device ', user_id, ' = ', t_sensor + t_energy + t_act)

@@ -85,19 +85,19 @@ def dailyReport():
     #     "11324" Vinmart
     # ]
 
-    if user_id in ["10019", "11294", "11296", "10940"]:
+    if user_id in ["10019", "11294", "11296", "10940", "11322"]:
         mail_list = [
             'nhat.thai@lab2lives.com',
             'thomas.luu@lab2lives.com'
         ]
         bcc_list = [
-            'tuan.le@lab2lives.com',
-            'hieu.tran@lab2lives.com',
-            'taddy@lab2lives.com',
-            'liam.thai@lab2lives.com',
-            'dung.bui@lab2lives.com',
-            'ann.tran@lab2lives.com',
-            'kevin.bui @ lab2lives.com'
+            # 'tuan.le@lab2lives.com',
+            # 'hieu.tran@lab2lives.com',
+            # 'taddy@lab2lives.com',
+            # 'liam.thai@lab2lives.com',
+            # 'dung.bui@lab2lives.com',
+            # 'ann.tran@lab2lives.com',
+            # 'kevin.bui@lab2lives.com'
         ]
     else:
         records = get_customer_emails()

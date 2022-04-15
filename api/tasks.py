@@ -100,7 +100,7 @@ def get_sensor_data(device_id: UUID, init_timestamp: int, duration: int) -> pd.D
     return df
 
 
-def get_activities_data(device_id: UUID, user_id: int, init_timestamp: int, duration: int) -> pd.DataFrame:
+def get_activities_data(device_id: UUID, init_timestamp: int, duration: int) -> pd.DataFrame:
     DATABASE_URL = os.environ.get("SOURCE_DATABASE_URL")
     engine = create_engine(DATABASE_URL)
 
