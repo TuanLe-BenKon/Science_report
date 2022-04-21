@@ -83,9 +83,10 @@ def dailyReport():
     #     "11320" JYSK
     #     "11322" REE
     #     "11324" Vinmart
+    #     "11325" Phong Vũ
     # ]
 
-    if user_id in ["10019", "11294", "11296", "10940", "11322"]:
+    if user_id in ["10019", "11294", "11296", "10940", "11322", "11320"]:
         mail_list = [
             'nhat.thai@lab2lives.com',
             'thomas.luu@lab2lives.com'

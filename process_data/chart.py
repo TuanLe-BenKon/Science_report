@@ -174,8 +174,9 @@ def export_energy_pie_chart(
 
     plt.setp(autotexts, size=12, weight="bold")
 
+    total_energy_consumption = np.round(total_energy_consumption, 1)
     title = ax.set_title(
-        'Total Energy Consumption ({}): {:.2f} kWh'.format(track_day, total_energy_consumption), fontsize=15)
+        'Total Energy Consumption: ' + r'$\bf{' + str(total_energy_consumption) + '} kWh$', fontsize=15, color='green')
     title.set_ha('left')
 
     plt.subplots_adjust(left=0.0, bottom=0.1, right=0.45)
@@ -267,13 +268,17 @@ def export_last_3_days_working_time(
     fig, axs = plt.subplots(2, 1, sharex=True, figsize=(12, 10))
     fig.subplots_adjust(hspace=0.05)
 
+    axs[0].yaxis.grid(linestyle='--', alpha=0.5, color='gray', zorder=0)
+    axs[1].yaxis.grid(linestyle='--', alpha=0.5, color='gray', zorder=0)
+
     g = sns.barplot(
         ax=axs[0],
         x='Device Name',
         y='Energy Consumption (kWh)',
         hue='Track Day',
         data=df_energy_consumption,
-        color='green'
+        color='green',
+        zorder=3
     )
     for al, bar in zip(alpha, axs[0].containers[0]):
         bar.set_alpha(alpha=al)
@@ -292,7 +297,8 @@ def export_last_3_days_working_time(
         y='Working Time (Hours)',
         hue='Track Day',
         data=df_working_time,
-        color='green'
+        color='green',
+        zorder=3
     )
     for al, bar in zip(alpha, axs[1].containers[0]):
         bar.set_alpha(alpha=al)
@@ -309,6 +315,8 @@ def export_last_3_days_working_time(
 
     plt.xticks(rotation=30)
     plt.legend(fontsize=10)
+
+    axs[0].set_title('Energy and Working Hour of the last 3 days', fontsize=14, color='green')
 
     plt.savefig(f'{bg_dir}/Last3DaysChart.png')
     plt.close()
