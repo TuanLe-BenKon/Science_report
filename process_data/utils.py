@@ -58,20 +58,22 @@ def drop_duplicated(df, f='n'):
 
 
 ## Outliers
-def process_outliers(df):
+def process_outliers(df: pd.DataFrame) -> pd.DataFrame:
 
-    Q1 = df['temperature'].quantile(0.2)
-    Q3 = df['temperature'].quantile(0.8)
+    if df.empty:
+        return df
 
-    IQR = Q3 - Q1
+    z_score = zscore(df['temperature'])
+    z_score = np.abs(z_score)
+    outliers = np.where(z_score > 3)[0]
 
-    outliers_filter = ((df['temperature'] < (Q1 - 1.5 * IQR)) | (df['temperature'] > (Q3 + 1.5 * IQR)))
-
-    outliers = df.loc[outliers_filter].index
-
-    for i in range(len(outliers)):
-        df.at[outliers[i], 'temperature'] = df['temperature'].iloc[outliers[i] - 1] 
-        df.at[outliers[i], 'humidity'] = df['humidity'].iloc[outliers[i] - 1]
+    for i in outliers:
+        if i == 0:
+            df.at[i, 'temperature'] = df['temperature'].iloc[i + 1]
+            df.at[i, 'humidity'] = df['humidity'].iloc[i + 1]
+        else:
+            df.at[i, 'temperature'] = df['temperature'].iloc[i - 1]
+            df.at[i, 'humidity'] = df['humidity'].iloc[i - 1]
 
     return df
 

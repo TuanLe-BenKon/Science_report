@@ -8,7 +8,7 @@ from werkzeug.exceptions import HTTPException
 from marshmallow import ValidationError
 from flask import Flask, render_template, jsonify, request
 
-from api.device_info.db import create_tables as create_device_table
+from api.device_info.db import create_tables as create_device_table, drop_tables as drop_device_table
 from api.customer_emails.db import create_tables as create_email_table
 from api.tasks import *
 from api.validation_schema import EnergyAlertTaskSchema, GenReportSchema
@@ -25,6 +25,17 @@ app = Flask(__name__)
 app.register_blueprint(device_bp, url_prefix="/science/v1/devices")
 app.register_blueprint(customer_bp, url_prefix="/science/v1/emails")
 app.register_blueprint(scheduler_bp, url_prefix="/science/v1/schedulers")
+
+
+file_id = {
+    '10019': '1K58R3jLRW2yLJ4sBmxsFcuji2bxC9NmH',
+    '11294': '1F0_JKypNFmbNOKoLlrCyJq26Q3-P-0y2',
+    '11296': '1meK1MqclPkkSDpUy7TyJ2zPsCeULUpHf',
+    '10940': '1G1avnG7BSQD_4WD1WG6IT_wEfbjoU6z2',
+    '11322': '11-lJQB-kgcJJ98v7cxtMx6pG0rrL6NX2',
+    '11320': '1mgHZaz-JvHpFx356xPAaM4QUSi89AfzD',
+    '11324': '1frwggoLhiI9EHr8dl9dxWCk2nCd4ELen'
+}
 
 
 @app.route("/science/v1", methods=["GET"])
@@ -61,7 +72,6 @@ def dailyReport():
             "outdoor_unit",
         ],
     )
-    df_info = df_info.drop(columns="no")
 
     IST = pytz.timezone("Asia/Ho_Chi_Minh")
     date = datetime.datetime.now(IST) - datetime.timedelta(days=1)
@@ -120,7 +130,7 @@ def dailyReport():
     print(mail_list)
     print(bcc_list)
 
-    gen_report(df_info, user_id, track_day)
+    gen_report(df_info, user_id, track_day, file_id.get(user_id))
     send_mail(df_info, user_id, track_day, mail_list, bcc_list)
 
     return message_resp()

@@ -17,6 +17,7 @@ from email.mime.text import MIMEText
 from bkreport import BenKonReport, BenKonReportData, ACActivity
 from process_data.extract_user_data import *
 from process_data.chart import *
+from api.ggdrive.tasks import upload_file
 
 power = {True: "ON", False: "OFF", None: "Không có"}
 local_chart_dir = os.path.join(os.getcwd(), "/tmp/chart")
@@ -49,7 +50,7 @@ def message_resp(text: str = "succeeded", status_code: int = 200) -> Response:
     return jsonify(msg=text), status_code
 
 
-def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
+def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str, file_id: str) -> None:
     username = get_username(df_info)
     device_name = get_device_name(df_info)
     device_id_list = get_device_list(df_info, user_id)
@@ -206,6 +207,9 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str) -> None:
         url_bar_chart=url_bar_chart,
         data=data
     )
+
+    # if file_id is not None:
+    #     upload_file(local_report_dir + '/BenKon_Daily_Report.pdf', f'[{track_day}]BenKon Daily Report - {username[user_id]}.pdf', file_id)
 
 
 def send_mail(

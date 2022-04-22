@@ -24,10 +24,4 @@ df_device_name = df_device_name[["device_id", "device_name"]]
 df_device_name = df_device_name.drop_duplicates().reset_index(drop=True)
 device_name = dict(zip(df_device_name["device_id"], df_device_name["device_name"]))
 
-## Open device_info spreadsheets
-sh = sa.open("Email List by User")
-sheet = sh.worksheet("email_list")
-rows = sheet.get_all_values()
-
-df_email = pd.DataFrame.from_records(rows[1:], columns=rows[0])
 
