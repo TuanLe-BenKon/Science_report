@@ -19,6 +19,7 @@ from api.customer_emails.routes import customer_bp
 from api.customer_emails.controllers import *
 from api.scheduler_jobs.routes import scheduler_bp
 from process_data.extract_user_data import *
+# from process_data.get_information import *
 
 
 app = Flask(__name__)
@@ -95,7 +96,10 @@ def dailyReport():
     #     "11320" JYSK
     #     "11322" REE
     #     "11324" Vinmart
-    #     "11325" Phong Vũ
+    #     "11325" Phong
+    #     "11338" TGDD
+    #     "11340" TGDD
+    #     "11341" TGDD
     # ]
 
     if user_id in ["10019", "11294", "11296", "10940", "11322", "11320"]:
