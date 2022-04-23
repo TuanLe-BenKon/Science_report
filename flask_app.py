@@ -64,6 +64,8 @@ def dailyReport():
         records,
         columns=[
             "no",
+            "customer_id",
+            "customer_name",
             "user_id",
             "user_name",
             "device_id",
