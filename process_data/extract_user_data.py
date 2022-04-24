@@ -57,6 +57,10 @@ def extract_user_data(user_id, device_id: str, track_day: str):
     df_energy.sort_values(by='timestamp', inplace=True)
     df_energy.reset_index(drop=True, inplace=True)
 
+    if user_id == '11322':
+        df_energy['energy'] = df_energy['energy'].apply(lambda x: x * 3)
+        df_energy['power'] = df_energy['power'].apply(lambda x: x * 3)
+
     ## DROP DUPLICATED
     df_energy = drop_duplicated(df_energy)
 

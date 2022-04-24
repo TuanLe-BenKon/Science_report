@@ -158,7 +158,7 @@ def export_energy_pie_chart(
     label_list = []
     idx = 0
     for lab in label:
-        label_list.append(lab + ' (' + str(np.round(energy_list[idx])) + 'kWh)')
+        label_list.append(lab + ' (' + str(np.round(energy_list[idx])) + ' kWh)')
         idx += 1
 
     # Adding legend
@@ -176,7 +176,7 @@ def export_energy_pie_chart(
 
     total_energy_consumption = np.round(total_energy_consumption, 1)
     title = ax.set_title(
-        'Total Energy Consumption: ' + r'$\bf{' + str(total_energy_consumption) + '} kWh$', fontsize=15, color='green')
+        f'Total Energy Consumption ({track_day}): ' + r'$\bf{' + str(total_energy_consumption) + '} kWh$', fontsize=15, color='green')
     title.set_ha('left')
 
     plt.subplots_adjust(left=0.0, bottom=0.1, right=0.45)
@@ -286,9 +286,13 @@ def export_last_3_days_working_time(
 
     g.set(xlabel=None)
     ax = axs[0]
-    for p in ax.patches:
-        axs[0].text(p.get_x() + p.get_width() / 2., p.get_height(), '%.1f' % p.get_height(), fontsize=10, color='red',
-                    ha='center', va='bottom')
+
+    idx = [i + 1 for i in range(len(device_list) * 3)]
+
+    for index, p in zip(idx, ax.patches):
+        if index >= len(device_list)*2 + 1:
+            axs[0].text(p.get_x() + p.get_width() / 2., p.get_height(), '%.1f' % p.get_height(), fontsize=10, color='red',
+                        ha='center', va='bottom')
 
     axs[1].set_ylim(0, 25)
     sns.barplot(
@@ -304,19 +308,20 @@ def export_last_3_days_working_time(
         bar.set_alpha(alpha=al)
 
     ax = axs[1]
-    for p in ax.patches:
-        working_hour = p.get_height()
-        hour = int(working_hour)
-        minute = int((p.get_height() - hour) * 60)
-        time_display = '{:02d}:{:02d}'.format(hour, minute)
+    for index, p in zip(idx, ax.patches):
+        if index >= len(device_list) * 2 + 1:
+            working_hour = p.get_height()
+            hour = int(working_hour)
+            minute = int((p.get_height() - hour) * 60)
+            time_display = '{:02d}:{:02d}'.format(hour, minute)
 
-        axs[1].text(p.get_x() + p.get_width() / 2., p.get_height(), time_display, fontsize=10, color='red',
-                    ha='center', va='bottom')
+            axs[1].text(p.get_x() + p.get_width() / 2., p.get_height(), time_display, fontsize=10, color='red',
+                        ha='center', va='bottom')
 
     plt.xticks(rotation=30)
     plt.legend(fontsize=10)
 
-    axs[0].set_title('Energy and Working Hour of the last 3 days', fontsize=14, color='green')
+    axs[0].set_title(f'Energy and Working Hour of the last 3 days - from {track_day_3} to {track_day}', fontsize=14, color='green')
 
     plt.savefig(f'{bg_dir}/Last3DaysChart.png')
     plt.close()

@@ -180,6 +180,72 @@ if __name__ == "__main__":
     load_dotenv(find_dotenv())
     create_device_table()
     create_email_table()
-    server_port = os.environ.get("PORT", "8080")
-    app.run(debug=False, port=server_port, host="0.0.0.0")
+
+    records = get_device_info()
+    df_info = pd.DataFrame(
+        records,
+        columns=[
+            "no",
+            "customer_id",
+            "customer_name",
+            "user_id",
+            "user_name",
+            "device_id",
+            "device_name",
+            "status",
+            "outdoor_unit",
+        ],
+    )
+
+    IST = pytz.timezone("Asia/Ho_Chi_Minh")
+    date = datetime.datetime.now(IST) - datetime.timedelta(days=1)
+    print(date)
+    # track_day = "{}-{:02d}-{:02d}".format(date.year, date.month, date.day)
+    track_day = '2022-04-22'
+
+    # ids = [
+    #     "10019",
+    #     "11294",
+    #     "11296",
+    #     "10940",
+    #     "12",
+    #     "590",
+    #     "176",
+    #     "26",
+    #     "11291",
+    #     "11290",
+    #     "11301",
+    #     "11320" JYSK
+    #     "11322" REE
+    #     "11324" Vinmart
+    #     "11325" Phong
+    #     "11338" TGDD
+    #     "11340" TGDD
+    #     "11341" TGDD
+    # ]
+
+    ids = ["11322"]
+    mail_list = [
+        'nhat.thai@lab2lives.com'
+    ]
+    bcc_list = [
+        # 'tuan.le@lab2lives.com',
+        # 'hieu.tran@lab2lives.com',
+        # 'taddy@lab2lives.com',
+        # 'liam.thai@lab2lives.com',
+        # 'dung.bui@lab2lives.com',
+        # 'ann.tran@lab2lives.com',
+        # 'kevin.bui@lab2lives.com'
+    ]
+
+    for user_id in ids:
+
+        print(mail_list)
+        print(bcc_list)
+
+        gen_report(df_info, user_id, track_day, file_id.get(user_id))
+        send_mail(df_info, user_id, track_day, mail_list, bcc_list)
+
+    # server_port = os.environ.get("PORT", "8080")
+    # app.run(debug=False, port=server_port, host="0.0.0.0")
 

@@ -179,7 +179,7 @@ def get_energy_consumption(df):
 ## Get Working Time
 def get_working_time(df):
     
-    df_working = df[df['power'] >= 8].reset_index(drop=True)
+    df_working = df[df['power'] >= 70].reset_index(drop=True)
     working_time = 0
     
     for i in range(len(df_working) - 1):
