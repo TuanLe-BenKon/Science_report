@@ -200,12 +200,19 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str, file_id: str
         url_bar_chart = ''
 
     os.makedirs(f"{local_report_dir}", exist_ok=True)
+
+    if user_id in ['11290', '11291']:
+        language = 'eng'
+    else:
+        language = 'vie'
+
     BenKonReport(
         f"{local_report_dir}/BenKon_Daily_Report.pdf",
         isGenSummaryPage=isGenSummaryPage,
         url_pie_chart=url_pie_chart,
         url_bar_chart=url_bar_chart,
-        data=data
+        data=data,
+        language=language
     )
 
     # if file_id is not None:
@@ -213,19 +220,31 @@ def gen_report(df_info: pd.DataFrame, user_id: str, track_day: str, file_id: str
 
 
 def send_mail(
-        df_info: pd.DataFrame, user_id: str, track_day: str, list_mail: List[str], bcc: List[str]
+        df_info: pd.DataFrame, user_id: str, track_day: str, list_mail: List[str], bcc: List[str], language: str = 'vie'
 ) -> None:
     username = get_username(df_info)
 
-    mail_content = """
-            Kính gửi quý khách hàng, \n
-            Đây là email tự động từ hệ thống BenKon AI Care. Quý khách hàng vui lòng liên hệ nhân viên BenKon để được hỗ trợ tốt nhất. 
-            Các khái niệm được dùng trong report:
-            • Electricity Index (Wh): Chỉ số điện năng, tương tự như chỉ số điện của công tơ điện tử dùng để đo đếm điện năng tiêu thụ của máy điều hoà.
-            • Power (W): Công suất tức thời, cho biết mức độ tiêu hao năng lượng của máy điều hoà .
-            • Temperature (°C): Nhiệt độ phòng tại vị trí gắn cảm biến (gần máy điều hoà).
-            • Humidity (%): Độ ẩm phòng tại vị trí gắn cảm biến (gần máy điều hoà). \n
-            Cám ơn quý khách hàng đã sử dụng dịch vụ Quản lý sử dụng điều hoà hiệu quả của BenKon.
+    if language == 'vie':
+        mail_content = """
+                Kính gửi quý khách hàng, \n
+                Đây là email tự động từ hệ thống BenKon AI Care. Quý khách hàng vui lòng liên hệ nhân viên BenKon để được hỗ trợ tốt nhất. 
+                Các khái niệm được dùng trong report:
+                • Electricity Index (Wh): Chỉ số điện năng, tương tự như chỉ số điện của công tơ điện tử dùng để đo đếm điện năng tiêu thụ của máy điều hoà.
+                • Power (W): Công suất tức thời, cho biết mức độ tiêu hao năng lượng của máy điều hoà.
+                • Temperature (°C): Nhiệt độ phòng tại vị trí gắn cảm biến (gần máy điều hoà).
+                • Humidity (%): Độ ẩm phòng tại vị trí gắn cảm biến (gần máy điều hoà). \n
+                Cám ơn quý khách hàng đã sử dụng dịch vụ Quản lý sử dụng điều hoà hiệu quả của BenKon.
+            """
+    else:
+        mail_content = """
+                Dear customer, \n
+                This is an automatic e-mail from the BenKon AI Care system. Please contact BenKon's staff for more information and support. \n
+                Here are definitions of the term used in the report:
+                • Electricity Index (Wh): The electricity index of the electric meter, which is used to measure the energy consumption of the Air Conditioner(s).
+                • Power (W): The instances power, which indicates the energy consumption of the Air Conditioner(s).
+                • Temperature (°C): The room's temperature measured at the sensor (near by the Air Conditioner).
+                • Humidity (%): The room's humidity measured at the sensor (near by the Air Conditioner). \n
+                Thank you for your entrust and usage of the Efficient BenKon's Air Conditioner Management System.
         """
 
     # The mail addresses and password

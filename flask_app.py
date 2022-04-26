@@ -137,7 +137,13 @@ def dailyReport():
     print(bcc_list)
 
     gen_report(df_info, user_id, track_day, file_id.get(user_id))
-    send_mail(df_info, user_id, track_day, mail_list, bcc_list)
+
+    if user_id in ['11290', '11291']:
+        language = 'eng'
+    else:
+        language = 'vie'
+
+    send_mail(df_info, user_id, track_day, mail_list, bcc_list, language)
 
     return message_resp()
 

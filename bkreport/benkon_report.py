@@ -15,8 +15,11 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 
-def getWeekdayName(time: datetime) -> str:
-    names = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"]
+def getWeekdayName(time: datetime, language: str = 'vie') -> str:
+    if language == 'vie':
+        names = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật"]
+    else:
+        names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     return names[time.weekday()]
 
 
@@ -44,11 +47,12 @@ class ReportConfig:
 
 
 class FooterCanvas(canvas.Canvas):
-    def __init__(self, filename, config: ReportConfig = ReportConfig(), *args, **kwargs):
+    def __init__(self, filename, language='vie', config: ReportConfig = ReportConfig(), *args, **kwargs):
         canvas.Canvas.__init__(self, filename, *args, **kwargs)
         self.pages = []
         self.conf = config
         self.conf.registerFont()
+        self.language = language
 
     def showPage(self):
         self.pages.append(dict(self.__dict__))
@@ -63,10 +67,14 @@ class FooterCanvas(canvas.Canvas):
         canvas.Canvas.save(self)
 
     def draw_canvas(self, page_count):
-        page = "Trang %s/%s" % (self._pageNumber, page_count)
+
+        if self.language == 'vie':
+            page = "Trang %s/%s" % (self._pageNumber, page_count)
+        else:
+            page = "Page %s/%s" % (self._pageNumber, page_count)
+
         now = datetime.now()
-        dateTime = getWeekdayName(
-            now) + now.strftime(", %d/%m/%Y %I:%M %p")
+        dateTime = getWeekdayName(now, language=self.language) + now.strftime(", %d/%m/%Y %I:%M %p")
         self.saveState()
         self.setStrokeColorRGB(0, 0, 0)
         self.setLineWidth(1)
@@ -133,7 +141,8 @@ class BenKonReport:
             url_pie_chart: str,
             url_bar_chart: str,
             data: "list[BenKonReportData]",
-            config: ReportConfig = ReportConfig()
+            config: ReportConfig = ReportConfig(),
+            language: str = 'vie'
     ):
         # Create path if not exists
         if not os.path.exists(os.path.dirname(path)):
@@ -144,6 +153,7 @@ class BenKonReport:
         self.conf.registerFont()
         self.path = path
         self.data = data
+        self.language = language
         self.url_pie_chart = url_pie_chart
         self.url_bar_chart = url_bar_chart
         self.styleSheet = getSampleStyleSheet()
@@ -175,7 +185,12 @@ class BenKonReport:
     def summaryPage(self):
         # Pie chart title
         self.elements.append(Spacer(10, 1 * cm))
-        chartTitleText = "Tổng điện năng tiêu thụ và thời gian hoạt động (3 ngày gần nhất)"
+
+        if self.language == 'vie':
+            chartTitleText = "Tổng điện năng tiêu thụ và thời gian hoạt động (3 ngày gần nhất)"
+        else:
+            chartTitleText = "Total energy consumption and working hours (last 3 days)"
+
         chartTitleStyle = ParagraphStyle(
             name="chartTitleStyle", fontName="NotoSans", fontSize=14, alignment=TA_CENTER)
         chartTitle = Paragraph("<b>%s</b>" % chartTitleText, chartTitleStyle)
@@ -214,14 +229,19 @@ class BenKonReport:
         self.elements.append(Spacer(10, 1.25 * cm))
         reportTitleStyle = ParagraphStyle(
             name="reportTitleStyle", fontName="NotoSans", fontSize=20, alignment=TA_CENTER)
-        title = "BÁO CÁO HOẠT ĐỘNG MÁY LẠNH"
+
+        if self.language == 'vie':
+            title = "BÁO CÁO HOẠT ĐỘNG MÁY LẠNH"
+        else:
+            title = "AIR CONDITIONER's ACTIVITIES DAILY REPORT"
+
         reportTitle = Paragraph("<b>%s</b>" % title, reportTitleStyle)
         self.elements.append(reportTitle)
 
         # report date
         self.elements.append(Spacer(10, 0.5 * cm))
         dateTime = getWeekdayName(
-            self.data[dataIndex].report_date) + self.data[dataIndex].report_date.strftime(", %d/%m/%Y")
+            self.data[dataIndex].report_date, language=self.language) + self.data[dataIndex].report_date.strftime(", %d/%m/%Y")
 
         reportDateStyle = ParagraphStyle(
             name="reportDateStyle", fontName="NotoSans", fontSize=12, alignment=TA_CENTER)
@@ -248,10 +268,16 @@ class BenKonReport:
         valueStyle = ParagraphStyle(
             name="Value", borderWidth=3, fontName="NotoSans")
 
-        rowUser = [imgUser, Paragraph("Khách hàng:", labelStyle), Paragraph(
-            "<b>%s</b>" % self.data[dataIndex].user, valueStyle)]
-        rowAC = [imgAC, Paragraph("Tên thiết bị:", labelStyle), Paragraph(
-            "<b>%s</b>" % self.data[dataIndex].device, valueStyle)]
+        if self.language == 'vie':
+            rowUser = [imgUser, Paragraph("Khách hàng:", labelStyle), Paragraph(
+                "<b>%s</b>" % self.data[dataIndex].user, valueStyle)]
+            rowAC = [imgAC, Paragraph("Tên thiết bị:", labelStyle), Paragraph(
+                "<b>%s</b>" % self.data[dataIndex].device, valueStyle)]
+        else:
+            rowUser = [imgUser, Paragraph("Username:", labelStyle), Paragraph(
+                "<b>%s</b>" % self.data[dataIndex].user, valueStyle)]
+            rowAC = [imgAC, Paragraph("Device name:", labelStyle), Paragraph(
+                "<b>%s</b>" % self.data[dataIndex].device, valueStyle)]
 
         tableData = [rowUser, rowAC]
         colWidths = [iconSize+0.3*cm, 2.5*cm, 1*cm]
@@ -265,7 +291,12 @@ class BenKonReport:
 
         # chart title
         self.elements.append(Spacer(10, 1 * cm))
-        chartTitleText = "Biểu đồ trạng thái máy lạnh trong ngày"
+
+        if self.language == 'vie':
+            chartTitleText = "Biểu đồ trạng thái máy lạnh trong ngày"
+        else:
+            chartTitleText = "Air conditioner's status chart"
+
         chartTitleStyle = ParagraphStyle(
             name="chartTitleStyle", fontName="NotoSans", fontSize=16, alignment=TA_CENTER)
         chartTitle = Paragraph("<b>%s</b>" % chartTitleText, chartTitleStyle)
@@ -302,7 +333,12 @@ class BenKonReport:
 
         # Energy title
         self.elements.append(Spacer(10, 1.5*cm))
-        chartTitleText = "Tổng điện năng tiêu thụ"
+
+        if self.language == 'vie':
+            chartTitleText = "Tổng điện năng tiêu thụ"
+        else:
+            chartTitleText = "Total energy consumption"
+
         chartTitleStyle = ParagraphStyle(
             name="chartTitleStyle", fontName="NotoSans", fontSize=16, alignment=TA_CENTER)
         chartTitle = Paragraph("<b>%s</b>" % chartTitleText, chartTitleStyle)
@@ -318,8 +354,14 @@ class BenKonReport:
         self.elements.append(spacer)
         psHeaderText = ParagraphStyle(
             'Hed0', fontSize=14, alignment=TA_CENTER, borderWidth=3, textColor=self.colorBlue, fontName="NotoSans")
-        paragraphReportHeader = Paragraph(
-            'Bảng các hoạt động trong ngày của máy lạnh', psHeaderText)
+
+        if self.language == 'vie':
+            paragraphReportHeader = Paragraph(
+                'Bảng các hoạt động trong ngày của máy lạnh', psHeaderText)
+        else:
+            paragraphReportHeader = Paragraph(
+                "Air conditioner's activities table of a day", psHeaderText)
+
         self.elements.append(paragraphReportHeader)
 
         spacer = Spacer(10, 22)
@@ -329,8 +371,13 @@ class BenKonReport:
         Create the line items
         """
         d = []
-        textData = ["STT", "Thời gian", "Hoạt động", "Trạng thái", "Chế độ",
-                    "Nhiệt độ thiết lập", "Tốc độ quạt"]
+
+        if self.language == 'vie':
+            textData = ["STT", "Thời gian", "Hoạt động", "Trạng thái", "Chế độ",
+                        "Nhiệt độ thiết lập", "Tốc độ quạt"]
+        else:
+            textData = ["No.", "Timestamp", "Activity", "Status", "Mode",
+                        "Set up temperature", "Fan speed"]
 
         fontSize = 8
         centered = ParagraphStyle(
