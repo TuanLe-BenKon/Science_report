@@ -7,3 +7,7 @@ class EnergyAlertTaskSchema(Schema):
     init_timestamp = fields.Integer(required=True)
     url = fields.String(required=False)
     in_seconds = fields.Integer(require=False)
+
+
+class GenReportSchema(Schema):
+    user_id = fields.String(required=True)

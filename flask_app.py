@@ -1,23 +1,150 @@
 import os
+
+import pandas as pd
+import datetime
+import pytz
 from dotenv import load_dotenv, find_dotenv
 from werkzeug.exceptions import HTTPException
-from marshmallow import Schema, fields, ValidationError
-from flask import Flask, render_template, jsonify, request, Response
+from marshmallow import ValidationError
+from flask import Flask, render_template, jsonify, request
 
-from api.tasks import energy_alert, register_energy_alert_task
-from api.validation_schema import EnergyAlertTaskSchema
-from api.utils import message_resp
+from api.device_info.db import create_tables as create_device_table, drop_tables as drop_device_table
+from api.customer_emails.db import create_tables as create_email_table
+from api.tasks import *
+from api.validation_schema import EnergyAlertTaskSchema, GenReportSchema
+from api.utils import message_resp, send_mail, gen_report
+from api.device_info.routes import device_bp
+from api.device_info.controllers import *
+from api.customer_emails.routes import customer_bp
+from api.customer_emails.controllers import *
+from api.scheduler_jobs.routes import scheduler_bp
+from process_data.extract_user_data import *
+# from process_data.get_information import *
+
 
 app = Flask(__name__)
+app.register_blueprint(device_bp, url_prefix="/science/v1/devices")
+app.register_blueprint(customer_bp, url_prefix="/science/v1/emails")
+app.register_blueprint(scheduler_bp, url_prefix="/science/v1/schedulers")
 
 
-@app.route("/science/")
+file_id = {
+    '10019': '1K58R3jLRW2yLJ4sBmxsFcuji2bxC9NmH',
+    '11294': '1F0_JKypNFmbNOKoLlrCyJq26Q3-P-0y2',
+    '11296': '1meK1MqclPkkSDpUy7TyJ2zPsCeULUpHf',
+    '10940': '1G1avnG7BSQD_4WD1WG6IT_wEfbjoU6z2',
+    '11322': '11-lJQB-kgcJJ98v7cxtMx6pG0rrL6NX2',
+    '11320': '1mgHZaz-JvHpFx356xPAaM4QUSi89AfzD',
+    '11324': '1frwggoLhiI9EHr8dl9dxWCk2nCd4ELen'
+}
+
+
+@app.route("/science/v1", methods=["GET"])
 def hello():
     return render_template("home.html")
 
 
-@app.route("/science/health/")
+@app.route("/science/v1/health", methods=["GET"])
 def health():
+    return message_resp()
+
+
+@app.route("/science/v1/daily-report", methods=["GET"])
+def dailyReport():
+
+    request_data = request.args
+    schema = GenReportSchema()
+    try:
+        data = schema.load(request_data)
+        user_id = data["user_id"]
+    except ValidationError as err:
+        return message_resp(err.messages, 400)
+
+    records = get_device_info()
+    df_info = pd.DataFrame(
+        records,
+        columns=[
+            "no",
+            "customer_id",
+            "customer_name",
+            "user_id",
+            "user_name",
+            "device_id",
+            "device_name",
+            "status",
+            "outdoor_unit",
+        ],
+    )
+
+    IST = pytz.timezone("Asia/Ho_Chi_Minh")
+    date = datetime.datetime.now(IST) - datetime.timedelta(days=1)
+    print(date)
+    track_day = "{}-{:02d}-{:02d}".format(date.year, date.month, date.day)
+
+    # ids = [
+    #     "10019",
+    #     "11294",
+    #     "11296",
+    #     "10940",
+    #     "12",
+    #     "590",
+    #     "176",
+    #     "26",
+    #     "11291",
+    #     "11290",
+    #     "11301",
+    #     "11320" JYSK
+    #     "11322" REE
+    #     "11324" Vinmart
+    #     "11325" Phong
+    #     "11338" TGDD
+    #     "11340" TGDD
+    #     "11341" TGDD
+    # ]
+
+    if user_id in ["10019", "11294", "11296", "10940", "11322", "11320"]:
+        mail_list = [
+            'nhat.thai@lab2lives.com',
+            'thomas.luu@lab2lives.com'
+        ]
+        bcc_list = [
+            'tuan.le@lab2lives.com',
+            'hieu.tran@lab2lives.com',
+            'taddy@lab2lives.com',
+            'liam.thai@lab2lives.com',
+            'dung.bui@lab2lives.com',
+            'ann.tran@lab2lives.com',
+            'kevin.bui@lab2lives.com'
+        ]
+    else:
+        records = get_customer_emails()
+        df_mail = pd.DataFrame(
+            records, columns=["no", "user_id", "user_name", "external", "internal"],
+        )
+
+        s = df_mail[df_mail["user_id"] == user_id].iloc[0]["external"]
+        mail_list = s[1:len(s) - 1].split(";")
+        if mail_list == ['']:
+            mail_list = [
+                "nhat.thai@lab2lives.com",
+                "thomas.luu@lab2lives.com"
+            ]
+
+        s = df_mail[df_mail["user_id"] == user_id].iloc[0]["internal"]
+        bcc_list = s[1:len(s) - 1].split(";")
+
+    print(mail_list)
+    print(bcc_list)
+
+    gen_report(df_info, user_id, track_day, file_id.get(user_id))
+
+    if user_id in ['11290', '11291']:
+        language = 'eng'
+    else:
+        language = 'vie'
+
+    send_mail(df_info, user_id, track_day, mail_list, bcc_list, language)
+
     return message_resp()
 
 
@@ -57,6 +184,8 @@ def global_error_handler(e):
 
 if __name__ == "__main__":
     load_dotenv(find_dotenv())
-
+    create_device_table()
+    create_email_table()
     server_port = os.environ.get("PORT", "8080")
     app.run(debug=False, port=server_port, host="0.0.0.0")
+
